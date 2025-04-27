@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第3回確認テスト（人体の構造と機能）</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+      background-size: cover; 
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1, h2 {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+
+}
+    .quiz-container, .result-card {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .question {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      color: #1d1d1f;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .option {
+      background-color: rgba(255, 255, 255, 0.7);
+  border: none;
+  border-radius: 16px;
+  padding: 15px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease 0.1s, transform 0.3s ease;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .option:hover {
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .option.selected {
+      background-color: #007aff;
+      color: #fff;
+    }
+    .option.disabled {
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+      }
+    /* 正解時のグラデーション */
+.option.correct {
+  background: linear-gradient(135deg, #34c759, #a8e6cf); /* 正解のグラデーション */
+  color: #fff;
+}
+
+/* 不正解時のグラデーション */
+.option.incorrect {
+  background: linear-gradient(135deg, #ff3b30, #ff9a8b); /* 不正解のグラデーション */
+  color: #fff;
+}
+
+    .option::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.1);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .option:active::after {
+      transform: scale(0.98);
+    }
+    .explanation {
+  margin-top: 20px;
+  font-size: 1em;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-left: 5px solid #4caf50;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  opacity: 1; /* 修正 */
+  transition: opacity 0.3s ease;
+}
+
+.explanation-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.explanation-icon {
+  font-size: 1.5em;
+  margin-right: 10px;
+}
+    .nav-button {
+  background: linear-gradient(135deg, #007aff, #5ac8fa);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-top: 20px;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-button:hover {
+  background: linear-gradient(135deg, #005bb5, #4aa0d3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.nav-button:active {
+  transform: scale(0.98);
+}
+    .result-card {
+      margin-bottom: 20px;
+    }
+    .result-card h3 {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .result-status {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .correct {
+      color: #34c759;
+    }
+    .incorrect {
+      color: #ff3b30;
+    }
+    #attendance-link {
+      background-color: #34c759;
+      color: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+    #attendance-link a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    #attendance-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align: center;">第3回確認テスト（人体の構造と機能）</h1>
+    <div id="quiz-container" class="quiz-container">
+      <div id="quiz-content">
+        <div id="question" class="question"></div>
+        <div id="options" class="options"></div>
+        <div id="explanation" class="explanation"></div>
+      </div>
+      <button id="next" class="nav-button" onclick="nextQuestion()">次の問題</button>
+    </div>
+    <div id="result-container"></div>
+    <div id="attendance-link"></div>
+  </div>
+  
+  
+  <script>
+    const quizData = [
+  {
+    "question": "血管の役割として適切でないものはどれか。",
+    "options": [
+      "酸素を運ぶ。",
+      "老廃物を運ぶ。",
+      "ホルモンを生成する。",
+      "栄養を運ぶ。"
+    ],
+    "answer": 2,
+    "explanation": "血管は酸素、栄養、老廃物、ホルモンなど、あらゆる物質の通り道となりますが、ホルモンを生成するのは内分泌腺などであり、血管そのものの役割ではありません。"
+  },
+  {
+    "question": "動脈壁を構成する組織の層について、正しい組み合わせはどれか。",
+    "options": [
+      "内膜、中膜、筋膜",
+      "内膜、中膜、外膜",
+      "上皮、平滑筋、結合組織",
+      "基底膜、内皮、外膜"
+    ],
+    "answer": 1,
+    "explanation": "動脈壁は血管内腔側から順に、内膜（内皮＋基底膜）、中膜（平滑筋層と弾性線維）、外膜（疎性結合組織）からなる 3 層構造です。"
+  },
+  {
+    "question": "毛細血管の特徴として最も適切なものはどれか。",
+    "options": [
+      "動脈と同様に3層構造を持つ。",
+      "主に骨格筋の収縮によって血液が流れる。",
+      "血管壁が薄く、物質交換が容易に行われる。",
+      "血液を心臓へ戻す役割を持つ。"
+    ],
+    "answer": 2,
+    "explanation": "毛細血管は1層の内皮細胞とその周囲の基底膜で構成されており血管壁が薄く、多くの物質が容易に通過できます。ここで栄養物、酸素、二酸化炭素、老廃物が血液と組織液との間で交換されます。"
+  },
+  {
+    "question": "静脈の特徴について、正しいものはどれか。",
+    "options": [
+      "常に動脈よりも血管壁が厚い。",
+      "血液の逆流を防ぐ弁が形成されていることがある。",
+      "酸素の多い血液を心臓へ運ぶ。",
+      "体循環では心臓から血液を送り出す血管である。"
+    ],
+    "answer": 1,
+    "explanation": "静脈は動脈と同様の構造を持ちますが、中膜と内膜は薄いです。また、静脈の内膜が内方におれまがり、弁が形成されていることがあります。体循環では静脈は心臓に血液が流入する血管であり 、二酸化炭素の多い血液を運びます 。"
+  },
+  {
+    "question": "静脈還流（血液が体循環の静脈を通って心臓に戻ること）を助けるメカニズムはどれか。",
+    "options": [
+      "心臓の拍動",
+      "骨格筋ポンプ",
+      "動脈の弾性収縮",
+      "腎臓での水分再吸収"
+    ],
+    "answer": 1,
+    "explanation": "静脈還流は、静脈と右心房の間の血圧差や、骨格筋ポンプ、呼吸ポンプによって助けられます。心臓の拍動は動脈血を送り出す主な駆動力ですが、静脈還流を直接助けるメカニズムとしては骨格筋ポンプや呼吸ポンプが挙げられています。"
+  },
+  {
+    "question": "下肢の静脈における骨格筋ポンプ作用の説明として最も適切なものはどれか。",
+    "options": [
+      "筋収縮によって静脈が圧迫され、血液が心臓に近い方向へ押し上げられる。",
+      "筋弛緩時に静脈弁が開き、血液が逆流するのを許容する。",
+      "心臓に近い側の静脈弁は常に閉じている。",
+      "骨格筋ポンプは主に動脈血の流れを促進する。"
+    ],
+    "answer": 0,
+    "explanation": "下腿の筋が収縮すると静脈を圧迫し、血液は心臓に近い弁を通過します（ミルキング作用。心臓から遠い位置にある静脈弁は閉じて逆流を防ぎます [4]。筋弛緩後は、収縮部位の血圧が低下し、心臓に近い側の静脈弁が閉じます。"
+  },
+  {
+    "question": "体循環の説明として最も適切なものはどれか。",
+    "options": [
+      "血液を肺に送り酸素を取り入れ、二酸化炭素を排出する循環。",
+      "全身に血液をおくり、酸素と栄養を運び、二酸化炭素や老廃物を心臓に戻す循環。",
+      "肝臓を通過して栄養分を吸収する循環。",
+      "心臓自身に血液を供給する循環。"
+    ],
+    "answer": 1,
+    "explanation": "体循環は、全身に血液をおくり、酸素と栄養を運ぶとともに、全身からの二酸化炭素や老廃物を心臓に戻す循環です 。"
+  },
+    {
+    "question": "肺循環の説明として最も適切なものはどれか。",
+    "options": [
+      "全身に酸素と栄養を運ぶ血液の流れ。",
+      "肝臓で解毒された血液が心臓に戻る流れ。",
+      "右心室から肺へ二酸化炭素の多い血液を送り、酸素を取り込んだ血液が左心房に戻る流れ。",
+      "腎臓で老廃物が濾過された血液が心臓に戻る流れ。"
+    ],
+    "answer": 2,
+    "explanation": "肺循環は、血液を肺に送り酸素を取り入れ、二酸化炭素を排出する循環です 。具体的には、右心室から肺動脈を通って肺へ二酸化炭素の多い血液が送られ、肺でガス交換が行われた後、酸素を取り込んだ血液が肺静脈を通って左心房に戻ります。"
+  },
+  {
+    "question": "体循環において、動脈と静脈を流れる血液の種類について正しい組み合わせはどれか。",
+    "options": [
+      "動脈：酸素が多い、静脈：二酸化炭素が多い",
+      "動脈：二酸化炭素が多い、静脈：酸素が多い",
+      "動脈：栄養が多い、静脈：老廃物が多い",
+      "動脈：ホルモンが多い、静脈：ホルモンが少ない"
+    ],
+    "answer": 0,
+    "explanation": "体循環では、動脈は酸素の多い血液を運び、静脈は二酸化炭素の多い血液を運びます 。"
+  },
+  {
+    "question": "肺循環において、肺動脈と肺静脈を流れる血液の種類について正しい組み合わせはどれか。",
+    "options": [
+      "肺動脈：酸素が多い、肺静脈：二酸化炭素が多い",
+      "肺動脈：二酸化炭素が多い、肺静脈：酸素が多い",
+      "肺動脈：栄養が多い、肺静脈：栄養が少ない",
+      "肺動脈：老廃物が多い、肺静脈：老廃物が少ない"
+    ],
+    "answer": 1,
+    "explanation": "肺循環においては、肺動脈は二酸化炭素の多い血液を運び、肺静脈は酸素の多い血液を運びます。"
+  },
+  {
+    "question": "呼吸器系の主な役割として最も適切なものはどれか。",
+    "options": [
+      "栄養分の吸収と運搬。",
+      "老廃物の濾過と排出。",
+      "空気中の酸素を取り込み、体内の二酸化炭素を排出すること。",
+      "ホルモンの生成と分泌。"
+    ],
+    "answer": 2,
+    "explanation": "呼吸器系は、空気中の酸素を取り込み、体内の二酸化炭素を排出する役割を担います。"
+  },
+  {
+    "question": "ソースに記載されている気道の全体像について、正しい順序はどれか。",
+    "options": [
+      "肺胞→気管支→気管",
+      "気管→気管支→肺胞",
+      "気管支→気管→肺胞",
+      "肺胞→気管→気管支"
+    ],
+    "answer": 1,
+    "explanation": "ソースでは、気道の全体像は気管→気管支→肺胞となると記載されています。"
+  },
+  {
+    "question": "呼吸器系において、血液と空気の間でガス交換（酸素と二酸化炭素の交換）が主に行われる場所はどこか。",
+    "options": [
+      "気管",
+      "気管支",
+      "肺胞",
+      "鼻腔"
+    ],
+    "answer": 2,
+    "explanation": "肺胞はガス交換が行われる場所です 。肺循環によって運ばれてきた血液が肺胞の毛細血管でガス交換を行います。"
+  },
+  {
+    "question": "肺胞に存在する細胞のうち、血液と空気の間で行われるガス交換のほとんどを行う細胞はどれか。",
+    "options": [
+      "サーファクタント分泌細胞",
+      "肺胞マクロファージ",
+      "血管内皮細胞",
+      "肺胞上皮細胞"
+    ],
+    "answer": 3,
+    "explanation": "肺胞上皮細胞は、血液と空気の間で酸素と二酸化炭素のガス交換のほとんどを行います 。サーファクタント分泌細胞はサーファクタントを含む肺胞液を分泌し 、肺胞マクロファージは塵埃粒子や異物を除去します 。血管内皮細胞は血管壁を構成する細胞であり、肺胞のガス交換に関わる細胞とは異なります。"
+  }
+]
+;
+
+      let currentQuestion = 0;
+    let score = 0;
+    let userAnswers = [];
+    let shuffledOptions = [];
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function loadQuestion() {
+      const question = quizData[currentQuestion];
+      document.getElementById('question').textContent = question.question;
+
+      shuffledOptions = shuffleArray([...question.options]);
+      const optionsHtml = shuffledOptions.map((option, index) => `
+        <div class="option" onclick="selectOption(${index})">${option}</div>
+      `).join('');
+
+      document.getElementById('options').innerHTML = optionsHtml;
+
+      // 解説のリセット
+      const explanationEl = document.getElementById('explanation');
+      explanationEl.style.opacity = '0';
+      explanationEl.style.display = 'none';
+    }
+
+    function selectOption(index) {
+  const options = document.querySelectorAll('.option');
+  if (options[index].classList.contains('disabled')) {
+    return;
+  }
+
+  // すべての選択肢を無効化
+  options.forEach(option => {
+    option.classList.add('disabled');
+  });
+
+  // 選択肢を選んだときに`selected`クラスを追加
+  options[index].classList.add('selected');
+
+  // 現在の問題を取得
+  const question = quizData[currentQuestion];
+  const selectedAnswerIndex = question.options.indexOf(shuffledOptions[index]);
+  userAnswers[currentQuestion] = selectedAnswerIndex;
+
+  // 解説の表示内容を設定
+  const explanationEl = document.getElementById('explanation');
+  explanationEl.innerHTML = `
+    <div class="explanation-header">
+      <span class="explanation-icon">💡</span>
+      解説
+    </div>
+    ${question.explanation}
+  `;
+  
+  // 一旦解説を見えないようにしてから表示の遅延を設定
+  explanationEl.style.opacity = '0';
+  explanationEl.style.display = 'block'; // まず表示を「block」にする
+
+  // 遅延を設定して解説をフェードイン
+  setTimeout(() => {
+    explanationEl.style.opacity = '1'; // 遅れてopacityを1にする
+  }, 200); // 200msの遅延を設定
+
+  // 正解・不正解のクラスを付与してグラデーションを適用
+  if (selectedAnswerIndex === question.answer) {
+    explanationEl.style.backgroundColor = '#e8f5e9';
+    explanationEl.style.borderLeftColor = '#4caf50';
+    options[index].classList.add('correct'); // 正解時に`correct`クラスを追加
+  } else {
+    explanationEl.style.backgroundColor = '#ffebee';
+    explanationEl.style.borderLeftColor = '#f44336';
+    options[index].classList.add('incorrect'); // 不正解時に`incorrect`クラスを追加
+  }
+}
+
+function loadQuestion() {
+  const question = quizData[currentQuestion];
+  document.getElementById('question').textContent = question.question;
+
+  shuffledOptions = shuffleArray([...question.options]);
+  const optionsHtml = shuffledOptions.map((option, index) => `
+    <div class="option" onclick="selectOption(${index})">${option}</div>
+  `).join('');
+
+  document.getElementById('options').innerHTML = optionsHtml;
+
+  // 解説のリセット
+  const explanationEl = document.getElementById('explanation');
+  explanationEl.style.display = 'none'; // 解説を非表示に
+  explanationEl.style.opacity = '0'; // 解説のopacityをリセット
+}
+
+function loadQuestion() {
+  const question = quizData[currentQuestion];
+  document.getElementById('question').textContent = question.question;
+
+  shuffledOptions = shuffleArray([...question.options]);
+  const optionsHtml = shuffledOptions.map((option, index) => `
+    <div class="option" onclick="selectOption(${index})">${option}</div>
+  `).join('');
+
+  document.getElementById('options').innerHTML = optionsHtml;
+
+  // 解説のリセット
+  const explanationEl = document.getElementById('explanation');
+  explanationEl.style.display = 'none'; // 解説を非表示に
+}
+    function nextQuestion() {
+      const selectedOption = document.querySelector('.option.selected');
+      if (selectedOption === null) {
+        alert('選択肢を選んでください');
+        return; 
+      }
+
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      score = userAnswers.reduce((total, answer, index) => 
+        total + (answer === quizData[index].answer ? 1 : 0), 0);
+
+      const resultContainer = document.getElementById('result-container');
+      const quizContainer = document.getElementById('quiz-container');
+      quizContainer.style.display = 'none';
+
+      const percentage = (score / quizData.length) * 100;
+      let resultHtml = `
+        <h2>クイズ結果</h2>
+        <p>正解数: ${score} / ${quizData.length}</p>
+        <p>正答率: ${percentage.toFixed(2)}%</p>
+      `;
+
+      quizData.forEach((question, index) => {
+        const isCorrect = userAnswers[index] === question.answer;
+        resultHtml += `
+          <div class="result-card">
+            <h3>問題 ${index + 1}</h3>
+            <p class="result-status ${isCorrect ? 'correct' : 'incorrect'}">
+              ${isCorrect ? '正解' : '不正解'}
+            </p>
+            <p><strong>質問:</strong> ${question.question}</p>
+            <p><strong>あなたの回答:</strong> ${question.options[userAnswers[index]] || '未回答'}</p>
+            <p><strong>正解:</strong> ${question.options[question.answer]}</p>
+            <p><strong>説明:</strong> ${question.explanation}</p>
+          </div>
+        `;
+      });
+
+      resultHtml += `<button class="nav-button" onclick="restartQuiz()">もう一度挑戦する</button>`;
+      resultContainer.innerHTML = resultHtml;
+
+      if (percentage === 100) {
+        const attendanceLink = document.getElementById('attendance-link');
+        attendanceLink.style.display = 'block';
+        attendanceLink.innerHTML = `
+          <p>おめでとうございます！全問正解です。</p>
+          <a href="https://forms.gle/BGREf2dBBaEsa82VA" target="_blank">出席確認フォームに回答する</a>
+        `;
+      }
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      userAnswers = [];
+      shuffledOptions = [];
+      document.getElementById('quiz-container').style.display = 'block';
+      document.getElementById('result-container').innerHTML = '';
+      document.getElementById('attendance-link').style.display = 'none';
+      loadQuestion();
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
