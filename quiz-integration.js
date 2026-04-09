@@ -12,6 +12,28 @@
     ready: false,
     profile: null,
   };
+  const PASS_PERCENTAGE = 80;
+
+  function restoreLiffStateIfNeeded() {
+    const params = new URLSearchParams(window.location.search);
+    const stateValue = params.get("liff.state");
+    if (!stateValue) {
+      return false;
+    }
+
+    const targetUrl = new URL(decodeURIComponent(stateValue), window.location.href);
+    const currentUrl = new URL(window.location.href);
+    const sameTarget =
+      targetUrl.pathname === currentUrl.pathname &&
+      targetUrl.search === currentUrl.search &&
+      targetUrl.hash === currentUrl.hash;
+
+    if (!sameTarget) {
+      window.location.replace(targetUrl.toString());
+      return true;
+    }
+    return false;
+  }
 
   function getQuizNo() {
     const match = window.location.pathname.match(/(\d+)(?:st|nd|rd|th)-test\.html$/i);
@@ -91,6 +113,9 @@
 
       try {
         await window.liff.init({ liffId: config.liffId });
+        if (restoreLiffStateIfNeeded()) {
+          return state;
+        }
         if (!window.liff.isLoggedIn()) {
           setStatus("LINEログインへ移動します...", "info");
           window.liff.login({ redirectUri: window.location.href });
@@ -100,7 +125,7 @@
         state.profile = await window.liff.getProfile();
         state.ready = true;
         setStatus(
-          `<strong>LINEログイン中</strong><br>${state.profile.displayName} さんとして結果を保存します。`,
+          `<strong>${state.profile.displayName}さん、ようこそ</strong><br>このアカウントで結果を保存します。`,
           "success"
         );
       } catch (error) {
@@ -185,9 +210,9 @@
       }
 
       const savedMessage = data.passed
-        ? `<p><strong>${data.name}さんの結果を保存しました。</strong></p><p>${data.quiz_label}: ${data.score} / ${data.total_questions} 問で満点です。</p>`
-        : `<p><strong>${data.name}さんの結果を保存しました。</strong></p><p>${data.quiz_label}: ${data.score} / ${data.total_questions} 問 (${data.percentage}%)</p>`;
-      setResult(savedMessage, "success");
+        ? `<p><strong>${data.name}さんの結果を保存しました。</strong></p><p>${data.quiz_label}: ${data.score} / ${data.total_questions} 問 (${data.percentage}%) で合格です。</p>`
+        : `<p><strong>${data.name}さんの結果を確認しました。</strong></p><p>${data.quiz_label}: ${data.score} / ${data.total_questions} 問 (${data.percentage}%) でした。合格基準は ${PASS_PERCENTAGE}% 以上です。今回は Firebase の合格記録は更新していません。</p>`;
+      setResult(savedMessage, data.passed ? "success" : "warning");
       return { ok: true, data };
     } catch (error) {
       console.error(error);

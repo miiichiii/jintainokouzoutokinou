@@ -111,6 +111,13 @@
       font-size: 1.15rem;
     }
 
+    .welcome-name {
+      margin-top: 12px;
+      color: var(--accent-strong);
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
     .panel p {
       margin: 0;
       color: var(--muted);
@@ -300,6 +307,7 @@
         先に LINE の出席 bot で学生登録を済ませてから受験してください。
         クイズ結果は LINE ログイン中の学生情報と紐づいて保存されます。
       </p>
+      <div id="welcome-name" class="welcome-name" style="display: none;"></div>
     </section>
 
     <div class="section-title">
@@ -321,6 +329,7 @@
     </div>
   </main>
 
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script src="quiz-auth-config.js"></script>
   <script>
     const lessons = [
@@ -339,6 +348,8 @@
     const publishedGrid = document.getElementById("published-grid");
     const upcomingGrid = document.getElementById("upcoming-grid");
     const liveCount = document.getElementById("live-count");
+    const welcomeName = document.getElementById("welcome-name");
+    const liffId = String((window.QUIZ_RUNTIME_CONFIG || {}).liffId || "").trim();
 
     function createCard(lesson) {
       const article = document.createElement("article");
@@ -346,11 +357,8 @@
 
       const statusClass = lesson.published ? "live" : "lock";
       const statusText = lesson.published ? "公開中" : "準備中";
-      const targetHref = lesson.published
-        ? buildLessonUrl(lesson.href)
-        : "#";
       const action = lesson.published
-        ? `<a class="button" href="${targetHref}">第${lesson.no}回を開く</a>`
+        ? `<a class="button" href="${buildLessonUrl(lesson.href)}">第${lesson.no}回を開く</a>`
         : `<div class="button-muted">公開までお待ちください</div>`;
 
       article.innerHTML = `
@@ -367,12 +375,50 @@
     }
 
     function buildLessonUrl(path) {
-      const config = window.QUIZ_RUNTIME_CONFIG || {};
-      const liffId = String(config.liffId || "").trim();
-      if (liffId) {
-        return `https://liff.line.me/${liffId}/${path}`;
+      if (!liffId) {
+        return path;
       }
-      return path;
+      return `https://liff.line.me/${liffId}/${path}`;
+    }
+
+    async function initIndexLiff() {
+      if (!liffId || !window.liff) {
+        return;
+      }
+
+      try {
+        await window.liff.init({
+          liffId,
+          withLoginOnExternalBrowser: true
+        });
+
+        if (window.liff.isLoggedIn()) {
+          const profile = await window.liff.getProfile();
+          if (profile && profile.displayName) {
+            welcomeName.textContent = `${profile.displayName}さん、ようこそ`;
+            welcomeName.style.display = "block";
+          }
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const state = params.get("liff.state");
+        if (!state) {
+          return;
+        }
+
+        const targetUrl = new URL(decodeURIComponent(state), window.location.href);
+        const currentUrl = new URL(window.location.href);
+        const sameTarget =
+          targetUrl.pathname === currentUrl.pathname &&
+          targetUrl.search === currentUrl.search &&
+          targetUrl.hash === currentUrl.hash;
+
+        if (!sameTarget) {
+          window.location.replace(targetUrl.toString());
+        }
+      } catch (error) {
+        console.error("LIFF init failed on index page:", error);
+      }
     }
 
     const published = lessons.filter((lesson) => lesson.published);
@@ -391,6 +437,8 @@
     } else {
       upcoming.forEach((lesson) => upcomingGrid.appendChild(createCard(lesson)));
     }
+
+    initIndexLiff();
   </script>
 </body>
 </html>
