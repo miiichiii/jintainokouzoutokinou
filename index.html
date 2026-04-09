@@ -321,6 +321,7 @@
     </div>
   </main>
 
+  <script src="quiz-auth-config.js"></script>
   <script>
     const lessons = [
       { no: 1, title: "解剖学の基礎", href: "1st-test.html", published: true },
@@ -345,8 +346,11 @@
 
       const statusClass = lesson.published ? "live" : "lock";
       const statusText = lesson.published ? "公開中" : "準備中";
+      const targetHref = lesson.published
+        ? buildLessonUrl(lesson.href)
+        : "#";
       const action = lesson.published
-        ? `<a class="button" href="${lesson.href}">第${lesson.no}回を開く</a>`
+        ? `<a class="button" href="${targetHref}">第${lesson.no}回を開く</a>`
         : `<div class="button-muted">公開までお待ちください</div>`;
 
       article.innerHTML = `
@@ -360,6 +364,15 @@
       `;
 
       return article;
+    }
+
+    function buildLessonUrl(path) {
+      const config = window.QUIZ_RUNTIME_CONFIG || {};
+      const liffId = String(config.liffId || "").trim();
+      if (liffId) {
+        return `https://liff.line.me/${liffId}/${path}`;
+      }
+      return path;
     }
 
     const published = lessons.filter((lesson) => lesson.published);
