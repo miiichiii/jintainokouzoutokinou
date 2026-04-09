@@ -1,1 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>人体の構造と機能 確認テスト</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-top: #f4efe6;
+      --bg-bottom: #d9ebf2;
+      --ink: #1f2937;
+      --muted: #5b6472;
+      --card: rgba(255, 255, 255, 0.74);
+      --card-strong: rgba(255, 255, 255, 0.9);
+      --line: rgba(53, 76, 110, 0.14);
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --accent-soft: #ccfbf1;
+      --locked: #e5e7eb;
+      --shadow: 0 24px 60px rgba(49, 71, 99, 0.16);
+    }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans JP", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(157, 223, 255, 0.4), transparent 28%),
+        linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 28px;
+      background:
+        linear-gradient(140deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.48)),
+        linear-gradient(135deg, rgba(20, 184, 166, 0.18), rgba(59, 130, 246, 0.12));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -72px -72px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(15, 118, 110, 0.16), transparent 66%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--accent-strong);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .panel {
+      margin-top: 28px;
+      padding: 22px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: 0 12px 30px rgba(72, 91, 120, 0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 1.15rem;
+    }
+
+    .panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 32px 0 16px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 240px;
+      padding: 22px;
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: var(--card-strong);
+      box-shadow: 0 12px 28px rgba(60, 81, 111, 0.1);
+      transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+    }
+
+    .card.available:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 36px rgba(40, 63, 94, 0.16);
+      border-color: rgba(15, 118, 110, 0.28);
+    }
+
+    .card.locked {
+      background: rgba(255, 255, 255, 0.54);
+      border-style: dashed;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .badge.live {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .badge.lock {
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    .lesson-no {
+      margin-top: 18px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .lesson-title {
+      margin-top: 8px;
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .card-footer {
+      margin-top: auto;
+      padding-top: 20px;
+    }
+
+    .button,
+    .button-muted {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 52px;
+      border-radius: 16px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .button {
+      color: white;
+      background: linear-gradient(135deg, var(--accent), #0ea5a0);
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+    }
+
+    .button-muted {
+      color: #6b7280;
+      background: var(--locked);
+      cursor: default;
+    }
+
+    .note {
+      margin-top: 28px;
+      padding: 18px 20px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.8;
+    }
+
+    .empty {
+      padding: 28px 22px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px dashed rgba(91, 100, 114, 0.28);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 20px, 1120px);
+        padding: 20px 0 40px;
+      }
+
+      .hero,
+      .panel,
+      .card {
+        padding: 18px;
+        border-radius: 20px;
+      }
+
+      .section-title {
+        display: block;
+      }
+
+      .section-title span {
+        display: block;
+        margin-top: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">Human Anatomy Quiz</div>
+      <h1>人体の構造と機能<br>確認テスト</h1>
+      <p>
+        毎週の確認テストはこちらから受験してください。下の一覧には、現在公開中のテストだけが表示されます。
+        次回分を追加するときは、このページ内の設定で <code>published: true</code> にしてください。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>受験前の確認</h2>
+      <p>
+        先に LINE の出席 bot で学生登録を済ませてから受験してください。
+        クイズ結果は LINE ログイン中の学生情報と紐づいて保存されます。
+      </p>
+    </section>
+
+    <div class="section-title">
+      <h2>公開中のテスト</h2>
+      <span id="live-count"></span>
+    </div>
+    <section id="published-grid" class="grid"></section>
+
+    <div class="section-title">
+      <h2>準備中</h2>
+      <span>必要になったらここに次回分を追加できます。</span>
+    </div>
+    <section id="upcoming-grid" class="grid"></section>
+
+    <div class="note">
+      運用メモ: 毎週の公開は、ページ下部の <code>lessons</code> 配列で対象回の <code>published</code> を切り替えるだけです。
+      ただし、ファイル自体がサーバー上に存在している限り、URL を知っていれば直接アクセスは可能です。
+      公開前の回を完全に見せたくない場合は、そのファイルをまだ配信しない運用にしてください。
+    </div>
+  </main>
+
+  <script>
+    const lessons = [
+      { no: 1, title: "解剖学の基礎", href: "1st-test.html", published: true },
+      { no: 2, title: "心臓と循環の基礎", href: "2nd-test.html", published: true },
+      { no: 3, title: "血管・循環と呼吸器", href: "3rd-test.html", published: true },
+      { no: 4, title: "消化器", href: "4th-test.html", published: true },
+      { no: 5, title: "感覚器", href: "5th-test.html", published: true },
+      { no: 6, title: "神経系", href: "6th-test.html", published: true },
+      { no: 7, title: "泌尿器・生殖器", href: "7th-test.html", published: true },
+
+      // 例:
+      // { no: 8, title: "次回の内容", href: "8th-test.html", published: false },
+    ];
+
+    const publishedGrid = document.getElementById("published-grid");
+    const upcomingGrid = document.getElementById("upcoming-grid");
+    const liveCount = document.getElementById("live-count");
+
+    function createCard(lesson) {
+      const article = document.createElement("article");
+      article.className = `card ${lesson.published ? "available" : "locked"}`;
+
+      const statusClass = lesson.published ? "live" : "lock";
+      const statusText = lesson.published ? "公開中" : "準備中";
+      const action = lesson.published
+        ? `<a class="button" href="${lesson.href}">第${lesson.no}回を開く</a>`
+        : `<div class="button-muted">公開までお待ちください</div>`;
+
+      article.innerHTML = `
+        <div class="badge-row">
+          <span class="badge ${statusClass}">${statusText}</span>
+          <span>第${lesson.no}回</span>
+        </div>
+        <div class="lesson-no">確認テスト ${lesson.no}</div>
+        <div class="lesson-title">${lesson.title}</div>
+        <div class="card-footer">${action}</div>
+      `;
+
+      return article;
+    }
+
+    const published = lessons.filter((lesson) => lesson.published);
+    const upcoming = lessons.filter((lesson) => !lesson.published);
+
+    liveCount.textContent = `${published.length}件公開中`;
+
+    if (published.length === 0) {
+      publishedGrid.innerHTML = '<div class="empty">現在公開中の確認テストはありません。</div>';
+    } else {
+      published.forEach((lesson) => publishedGrid.appendChild(createCard(lesson)));
+    }
+
+    if (upcoming.length === 0) {
+      upcomingGrid.innerHTML = '<div class="empty">準備中のテストはありません。</div>';
+    } else {
+      upcoming.forEach((lesson) => upcomingGrid.appendChild(createCard(lesson)));
+    }
+  </script>
+</body>
+</html>
