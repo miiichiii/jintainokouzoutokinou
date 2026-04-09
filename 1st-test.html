@@ -184,6 +184,7 @@
 <body>
   <div class="container">
     <h1 style="text-align: center;">第１回確認テスト（人体の構造と機能）</h1>
+    <div id="line-auth-status" class="result-card" style="display: none;"></div>
     <div id="quiz-container" class="quiz-container">
       <div id="quiz-content">
         <div id="question" class="question"></div>
@@ -506,13 +507,15 @@ function loadQuestion() {
       resultHtml += `<button class="nav-button" onclick="restartQuiz()">もう一度挑戦する</button>`;
       resultContainer.innerHTML = resultHtml;
 
-      if (percentage === 100) {
-        const attendanceLink = document.getElementById('attendance-link');
-        attendanceLink.style.display = 'block';
-        attendanceLink.innerHTML = `
-          <p>おめでとうございます！全問正解です。</p>
-          <a href="https://forms.gle/HNSAs41nTv95XThCA" target="_blank">出席確認フォームに回答する</a>
-        `;
+      if (window.quizIntegration) {
+        window.quizIntegration.submitQuizResult({
+          quizNo: window.quizIntegration.getQuizNo(),
+          quizTitle: document.title,
+          score,
+          totalQuestions: quizData.length,
+          userAnswers,
+          quizData
+        });
       }
     }
 
@@ -523,11 +526,18 @@ function loadQuestion() {
       shuffledOptions = [];
       document.getElementById('quiz-container').style.display = 'block';
       document.getElementById('result-container').innerHTML = '';
-      document.getElementById('attendance-link').style.display = 'none';
+      if (window.quizIntegration) {
+        window.quizIntegration.resetResultMessage();
+      } else {
+        document.getElementById('attendance-link').style.display = 'none';
+      }
       loadQuestion();
     }
 
     loadQuestion();
   </script>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="quiz-auth-config.js"></script>
+  <script src="quiz-integration.js"></script>
 </body>
 </html>
