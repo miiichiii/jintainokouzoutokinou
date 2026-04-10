@@ -95,6 +95,16 @@
     element.innerHTML = html;
   }
 
+  function formatDelta(value) {
+    if (typeof value !== "number" || Number.isNaN(value)) {
+      return "";
+    }
+    if (value > 0) {
+      return `+${value}`;
+    }
+    return `${value}`;
+  }
+
   async function initLiff() {
     if (state.initPromise) {
       return state.initPromise;
@@ -209,9 +219,29 @@
         return { ok: false, error: message };
       }
 
+      const progressLines = [
+        `<p>${data.quiz_label}: 今回 ${data.score} / ${data.total_questions} 問 (${data.percentage}%)</p>`,
+        `<p>これまで ${data.attempt_count} 回挑戦 / 最高 ${data.best_score} / ${data.best_total_questions} 問 (${data.best_percentage}%)</p>`,
+      ];
+      if (typeof data.percentage_delta === "number") {
+        progressLines.push(`<p>前回比 ${formatDelta(data.percentage_delta)}%</p>`);
+      }
+      if (data.best_updated) {
+        progressLines.push("<p>自己ベスト更新です。</p>");
+      }
+      if (data.first_pass_achieved) {
+        progressLines.push(`<p>今回が初回合格です。合格基準は ${PASS_PERCENTAGE}% 以上です。</p>`);
+      } else if (data.passed) {
+        progressLines.push(`<p>${PASS_PERCENTAGE}% 以上で合格です。</p>`);
+      } else if (data.overall_passed) {
+        progressLines.push(`<p>今回の結果は未到達でしたが、これまでの合格記録は保持されています。</p>`);
+      } else {
+        progressLines.push(`<p>合格基準は ${PASS_PERCENTAGE}% 以上です。次の挑戦で更新を狙ってください。</p>`);
+      }
+
       const savedMessage = data.passed
-        ? `<p><strong>${data.name}さんの結果を保存しました。</strong></p><p>${data.quiz_label}: ${data.score} / ${data.total_questions} 問 (${data.percentage}%) で合格です。</p>`
-        : `<p><strong>${data.name}さんの結果を確認しました。</strong></p><p>${data.quiz_label}: ${data.score} / ${data.total_questions} 問 (${data.percentage}%) でした。合格基準は ${PASS_PERCENTAGE}% 以上です。今回は Firebase の合格記録は更新していません。</p>`;
+        ? `<p><strong>${data.name}さんの結果を記録しました。</strong></p>${progressLines.join("")}`
+        : `<p><strong>${data.name}さんの挑戦を記録しました。</strong></p>${progressLines.join("")}`;
       setResult(savedMessage, data.passed ? "success" : "warning");
       return { ok: true, data };
     } catch (error) {
