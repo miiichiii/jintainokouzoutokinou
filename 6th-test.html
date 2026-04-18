@@ -506,6 +506,7 @@
       });
 
       resultHtml += `<button class="nav-button" onclick="restartQuiz()">もう一度挑戦する</button>`;
+      resultHtml += `<button class="nav-button" onclick="goToTopPage()" style="margin-top: 12px; background: linear-gradient(135deg, #64748b, #94a3b8);">トップページに戻る</button>`;
       resultContainer.innerHTML = resultHtml;
 
       if (window.quizIntegration) {
@@ -533,6 +534,10 @@
         document.getElementById('attendance-link').style.display = 'none';
       }
       loadQuestion();
+    }
+
+    function goToTopPage() {
+      window.location.href = 'index.html';
     }
 
     loadQuestion();
