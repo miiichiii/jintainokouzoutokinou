@@ -361,6 +361,34 @@
       color: #173665;
     }
 
+    .welcome-chart {
+      margin-top: 16px;
+      padding: 18px 18px 14px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(84, 104, 142, 0.1);
+      box-shadow: 0 10px 24px rgba(84, 101, 140, 0.08);
+    }
+
+    .welcome-chart-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #4a5b76;
+      margin-bottom: 12px;
+    }
+
+    .welcome-chart svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .welcome-chart-empty {
+      color: #6b7280;
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
     .panel-copy {
       margin: 0;
       color: var(--muted);
@@ -460,6 +488,11 @@
       border-color: rgba(44, 123, 229, 0.26);
     }
 
+    .card.cleared {
+      border-color: rgba(34, 197, 94, 0.28);
+      box-shadow: 0 24px 42px rgba(57, 128, 91, 0.14);
+    }
+
     .card.locked {
       background:
         linear-gradient(150deg, rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.4)),
@@ -491,6 +524,11 @@
     .badge.lock {
       background: rgba(229, 231, 235, 0.82);
       color: #6b7280;
+    }
+
+    .badge.cleared {
+      background: rgba(220, 252, 231, 0.86);
+      color: #15803d;
     }
 
     .lesson-phase {
@@ -629,10 +667,11 @@
           <div id="welcome-perfect" class="welcome-stat-value">0</div>
         </div>
         <div class="welcome-stat">
-          <div class="welcome-stat-label">最高到達率</div>
-          <div id="welcome-best" class="welcome-stat-value">0%</div>
+          <div class="welcome-stat-label">達成率</div>
+          <div id="welcome-completion" class="welcome-stat-value">0%</div>
         </div>
       </div>
+      <div id="welcome-chart" class="welcome-chart" style="display: none;"></div>
     </section>
 
     <div class="section-title">
@@ -676,24 +715,33 @@
     const welcomeTotalAttempts = document.getElementById("welcome-total-attempts");
     const welcomeCleared = document.getElementById("welcome-cleared-count");
     const welcomePerfect = document.getElementById("welcome-perfect");
-    const welcomeBest = document.getElementById("welcome-best");
+    const welcomeCompletion = document.getElementById("welcome-completion");
+    const welcomeChart = document.getElementById("welcome-chart");
     const apiBaseUrl = String((window.QUIZ_RUNTIME_CONFIG || {}).apiBaseUrl || "").replace(/\/$/, "");
     const quizSet = String((window.QUIZ_RUNTIME_CONFIG || {}).quizSet || "jintainokouzoutokinou").trim();
     const liffId = String((window.QUIZ_RUNTIME_CONFIG || {}).liffId || "").trim();
+    let clearedQuizNumbers = new Set();
 
     function createCard(lesson) {
       const article = document.createElement("article");
-      article.className = `card ${lesson.published ? "available" : "locked"}`;
+      const isCleared = clearedQuizNumbers.has(lesson.no);
+      article.className = `card ${lesson.published ? "available" : "locked"}${isCleared ? " cleared" : ""}`;
 
       const statusClass = lesson.published ? "live" : "lock";
       const statusText = lesson.published ? "公開中" : "準備中";
       const action = lesson.published
         ? `<a class="button" href="${buildLessonUrl(lesson.href)}">第${lesson.no}回を開く</a>`
         : `<div class="button-muted">公開までお待ちください</div>`;
+      const clearedBadge = isCleared
+        ? '<span class="badge cleared">クリア済み</span>'
+        : '';
 
       article.innerHTML = `
         <div class="badge-row">
-          <span class="badge ${statusClass}">${statusText}</span>
+          <span style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="badge ${statusClass}">${statusText}</span>
+            ${clearedBadge}
+          </span>
           <span class="lesson-phase">Lesson ${String(lesson.no).padStart(2, "0")}</span>
         </div>
         <div class="lesson-no">確認テスト ${lesson.no}</div>
@@ -716,6 +764,74 @@
         return "まだありません";
       }
       return labels.join(" / ");
+    }
+
+    function buildProgressChart(history) {
+      if (!Array.isArray(history) || history.length === 0) {
+        return `
+          <div class="welcome-chart-title">挑戦ごとの正答率</div>
+          <div class="welcome-chart-empty">まだ履歴がありません。最初の挑戦から線が描かれます。</div>
+        `;
+      }
+
+      const width = 640;
+      const height = 220;
+      const left = 42;
+      const right = 20;
+      const top = 14;
+      const bottom = 34;
+      const innerWidth = width - left - right;
+      const innerHeight = height - top - bottom;
+      const maxIndex = Math.max(history.length - 1, 1);
+
+      const points = history.map((item, index) => {
+        const x = left + (innerWidth * (index / maxIndex));
+        const percentage = Number(item.percentage || 0);
+        const y = top + innerHeight - (innerHeight * Math.max(0, Math.min(percentage, 100)) / 100);
+        return { x, y, percentage, quizNo: item.quiz_no, sequence: item.sequence };
+      });
+
+      const polyline = points.map((point) => `${point.x},${point.y}`).join(" ");
+      const pointMarkup = points.map((point) => `
+        <circle cx="${point.x}" cy="${point.y}" r="4.5" fill="${point.percentage >= 80 ? '#16a34a' : '#2c7be5'}"></circle>
+      `).join("");
+      const labelMarkup = points.map((point) => `
+        <text x="${point.x}" y="${height - 10}" text-anchor="middle" font-size="11" fill="#64748b">${point.sequence}</text>
+      `).join("");
+      const yGuides = [0, 50, 80, 100].map((value) => {
+        const y = top + innerHeight - (innerHeight * value / 100);
+        return `
+          <line x1="${left}" y1="${y}" x2="${width - right}" y2="${y}" stroke="${value === 80 ? 'rgba(22,163,74,0.35)' : 'rgba(100,116,139,0.18)'}" stroke-dasharray="${value === 80 ? '6 4' : '4 5'}"></line>
+          <text x="${left - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="#64748b">${value}%</text>
+        `;
+      }).join("");
+
+      return `
+        <div class="welcome-chart-title">挑戦ごとの正答率</div>
+        <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="挑戦ごとの正答率の折れ線グラフ">
+          ${yGuides}
+          <polyline fill="none" stroke="#2c7be5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${polyline}"></polyline>
+          ${pointMarkup}
+          ${labelMarkup}
+          <text x="${width / 2}" y="${height - 2}" text-anchor="middle" font-size="11" fill="#64748b">挑戦回数</text>
+        </svg>
+      `;
+    }
+
+    function renderLessonCards() {
+      if (published.length === 0) {
+        publishedGrid.innerHTML = '<div class="empty">現在公開中の確認テストはありません。</div>';
+      } else {
+        publishedGrid.innerHTML = "";
+        published.forEach((lesson) => publishedGrid.appendChild(createCard(lesson)));
+      }
+
+      if (upcoming.length === 0) {
+        upcomingGrid.innerHTML = '<div class="empty">準備中のテストはありません。</div>';
+      } else {
+        upcomingGrid.innerHTML = "";
+        upcoming.forEach((lesson) => upcomingGrid.appendChild(createCard(lesson)));
+      }
     }
 
     async function loadWelcomeProgress() {
@@ -754,7 +870,11 @@
         welcomeTotalAttempts.textContent = String(data.total_attempts ?? 0);
         welcomeCleared.textContent = `${data.cleared_quizzes ?? 0} / ${data.total_quizzes ?? 0}`;
         welcomePerfect.textContent = String(data.perfect_clears ?? 0);
-        welcomeBest.textContent = `${data.best_percentage ?? 0}%`;
+        welcomeCompletion.textContent = `${data.completion_rate ?? 0}%`;
+        welcomeChart.innerHTML = buildProgressChart(data.attempt_history);
+        welcomeChart.style.display = "block";
+        clearedQuizNumbers = new Set((data.cleared_quiz_numbers || []).map((value) => Number(value)));
+        renderLessonCards();
       } catch (error) {
         console.error("Progress summary fetch failed:", error);
       }
@@ -805,17 +925,7 @@
     const upcoming = lessons.filter((lesson) => !lesson.published);
 
     liveCount.textContent = `${published.length}件公開中`;
-    if (published.length === 0) {
-      publishedGrid.innerHTML = '<div class="empty">現在公開中の確認テストはありません。</div>';
-    } else {
-      published.forEach((lesson) => publishedGrid.appendChild(createCard(lesson)));
-    }
-
-    if (upcoming.length === 0) {
-      upcomingGrid.innerHTML = '<div class="empty">準備中のテストはありません。</div>';
-    } else {
-      upcoming.forEach((lesson) => upcomingGrid.appendChild(createCard(lesson)));
-    }
+    renderLessonCards();
 
     initIndexLiff();
   </script>
