@@ -543,46 +543,10 @@
       <div class="hero-copy">
         <div class="eyebrow">Human Anatomy Quiz</div>
         <h1>人体の構造と機能<br>確認テスト</h1>
-        <p class="hero-lead">
-          毎週の確認テストはこちらから受験してください。クイズ本編と同じ空気感で、公開中の回だけを迷わず開けるトップページにしています。
-        </p>
-        <div class="hero-points">
-          <div class="hero-chip"><strong>LINE</strong> ログインで受験</div>
-          <div class="hero-chip"><strong>80%</strong> 以上で合格</div>
-          <div class="hero-chip"><strong>Progress</strong> 自己ベストを記録</div>
-        </div>
-      </div>
-      <div class="hero-aside">
-        <div class="hero-orbital">
-          <div class="orbital-label">Live Lesson</div>
-          <div id="hero-live-count" class="orbital-value">01</div>
-          <div class="orbital-caption">
-            今週受験できる確認テストの数です。公開された回だけ下の一覧に表示されます。
-          </div>
-        </div>
-        <div class="hero-mini-grid">
-          <div class="mini-stat">
-            <div class="mini-stat-label">総回数</div>
-            <div id="hero-total-count" class="mini-stat-value">07</div>
-          </div>
-          <div class="mini-stat">
-            <div class="mini-stat-label">準備中</div>
-            <div id="hero-upcoming-count" class="mini-stat-value">06</div>
-          </div>
-        </div>
       </div>
     </section>
 
-    <section class="panel">
-      <h2>受験前の確認</h2>
-      <p class="panel-copy">
-        先に LINE の出席 bot で学生登録を済ませてから受験してください。
-        クイズ結果は LINE ログイン中の学生情報と紐づいて保存されます。
-      </p>
-      <ul class="panel-list">
-        <li>クイズはスマートフォンからそのまま受験できます。</li>
-        <li>合格後も再挑戦すると、自己ベストや前回比が更新されます。</li>
-      </ul>
+    <section id="welcome-panel" class="panel" style="display: none;">
       <div id="welcome-name" class="welcome-name" style="display: none;"></div>
     </section>
 
@@ -618,9 +582,7 @@
     const publishedGrid = document.getElementById("published-grid");
     const upcomingGrid = document.getElementById("upcoming-grid");
     const liveCount = document.getElementById("live-count");
-    const heroLiveCount = document.getElementById("hero-live-count");
-    const heroTotalCount = document.getElementById("hero-total-count");
-    const heroUpcomingCount = document.getElementById("hero-upcoming-count");
+    const welcomePanel = document.getElementById("welcome-panel");
     const welcomeName = document.getElementById("welcome-name");
     const liffId = String((window.QUIZ_RUNTIME_CONFIG || {}).liffId || "").trim();
 
@@ -668,6 +630,7 @@
         if (window.liff.isLoggedIn()) {
           const profile = await window.liff.getProfile();
           if (profile && profile.displayName) {
+            welcomePanel.style.display = "block";
             welcomeName.textContent = `${profile.displayName}さん、ようこそ`;
             welcomeName.style.display = "block";
           }
@@ -698,10 +661,6 @@
     const upcoming = lessons.filter((lesson) => !lesson.published);
 
     liveCount.textContent = `${published.length}件公開中`;
-    heroLiveCount.textContent = String(published.length).padStart(2, "0");
-    heroTotalCount.textContent = String(lessons.length).padStart(2, "0");
-    heroUpcomingCount.textContent = String(upcoming.length).padStart(2, "0");
-
     if (published.length === 0) {
       publishedGrid.innerHTML = '<div class="empty">現在公開中の確認テストはありません。</div>';
     } else {
