@@ -426,38 +426,6 @@
   }
 }
 
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-  explanationEl.style.opacity = '0'; // 解説のopacityをリセット
-}
-
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-}
     function nextQuestion() {
       const selectedOption = document.querySelector('.option.selected');
       if (selectedOption === null) {

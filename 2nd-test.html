@@ -225,13 +225,13 @@
   {
     "question": "心臓の心尖部は、体幹のどの方向を向いているか。",
     "options": [
-      "右方向",
-      "後方向",
-      "左下向",
-      "上方向"
+      "右上方",
+      "後方",
+      "左前下方",
+      "真上"
     ],
     "answer": 2,
-    "explanation": "心臓は胸腔内でやや左に傾いて位置しており、心尖部は左前下方を向いています。選択肢の中では「左方向」が最も適切です。"
+    "explanation": "心臓は胸腔内でやや左に傾いて位置しており、心尖部（心臓の先端）は左前下方を向いています。第5肋間鎖骨中線付近で心尖拍動として触知できます。"
   },
   {
     "question": "肺循環において、二酸化炭素の多い血液が送られる場所はどこか。",
@@ -448,38 +448,6 @@
   }
 }
 
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-  explanationEl.style.opacity = '0'; // 解説のopacityをリセット
-}
-
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-}
     function nextQuestion() {
       const selectedOption = document.querySelector('.option.selected');
       if (selectedOption === null) {

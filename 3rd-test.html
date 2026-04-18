@@ -264,7 +264,7 @@
       "骨格筋ポンプは主に動脈血の流れを促進する。"
     ],
     "answer": 0,
-    "explanation": "下腿の筋が収縮すると静脈を圧迫し、血液は心臓に近い弁を通過します（ミルキング作用。心臓から遠い位置にある静脈弁は閉じて逆流を防ぎます [4]。筋弛緩後は、収縮部位の血圧が低下し、心臓に近い側の静脈弁が閉じます。"
+    "explanation": "下腿の筋が収縮すると静脈を圧迫し、血液は心臓に近い弁を通過します（ミルキング作用）。心臓から遠い位置にある静脈弁は閉じて逆流を防ぎます。筋弛緩後は、収縮部位の血圧が低下し、心臓に近い側の静脈弁が閉じます。"
   },
   {
     "question": "体循環の説明として最も適切なものはどれか。",
@@ -277,16 +277,16 @@
     "answer": 1,
     "explanation": "体循環は、全身に血液をおくり、酸素と栄養を運ぶとともに、全身からの二酸化炭素や老廃物を心臓に戻す循環です 。"
   },
-    {
-    "question": "肺循環の説明として最も適切なものはどれか。",
+  {
+    "question": "右主気管支と左主気管支を比較したときの右主気管支の特徴として最も適切なものはどれか。",
     "options": [
-      "全身に酸素と栄養を運ぶ血液の流れ。",
-      "肝臓で解毒された血液が心臓に戻る流れ。",
-      "右心室から肺へ二酸化炭素の多い血液を送り、酸素を取り込んだ血液が左心房に戻る流れ。",
-      "腎臓で老廃物が濾過された血液が心臓に戻る流れ。"
+      "左主気管支よりも細く長い。",
+      "左主気管支よりも太く短く、より垂直に近い角度で分岐する。",
+      "左主気管支と全く同じ形状・角度である。",
+      "気管支軟骨を欠く。"
     ],
-    "answer": 2,
-    "explanation": "肺循環は、血液を肺に送り酸素を取り入れ、二酸化炭素を排出する循環です 。具体的には、右心室から肺動脈を通って肺へ二酸化炭素の多い血液が送られ、肺でガス交換が行われた後、酸素を取り込んだ血液が肺静脈を通って左心房に戻ります。"
+    "answer": 1,
+    "explanation": "右主気管支は左主気管支よりも太く短く、気管からの分岐角度がより垂直に近いため、誤嚥した異物が入り込みやすい側とされます。臨床的にも誤嚥性肺炎は右肺に多発します。"
   },
   {
     "question": "体循環において、動脈と静脈を流れる血液の種類について正しい組み合わせはどれか。",
@@ -322,7 +322,7 @@
     "explanation": "呼吸器系は、空気中の酸素を取り込み、体内の二酸化炭素を排出する役割を担います。"
   },
   {
-    "question": "ソースに記載されている気道の全体像について、正しい順序はどれか。",
+    "question": "気道の全体像について、空気の流れを正しい順序で示したものはどれか。",
     "options": [
       "肺胞→気管支→気管",
       "気管→気管支→肺胞",
@@ -330,7 +330,7 @@
       "肺胞→気管→気管支"
     ],
     "answer": 1,
-    "explanation": "ソースでは、気道の全体像は気管→気管支→肺胞となると記載されています。"
+    "explanation": "吸気の流れは、鼻腔・口腔→咽頭→喉頭→気管→主気管支→細気管支→肺胞という順路をたどります。"
   },
   {
     "question": "呼吸器系において、血液と空気の間でガス交換（酸素と二酸化炭素の交換）が主に行われる場所はどこか。",
@@ -437,38 +437,6 @@
   }
 }
 
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-  explanationEl.style.opacity = '0'; // 解説のopacityをリセット
-}
-
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-}
     function nextQuestion() {
       const selectedOption = document.querySelector('.option.selected');
       if (selectedOption === null) {

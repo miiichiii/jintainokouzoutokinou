@@ -309,7 +309,62 @@
   ],
   "answer": 1,
   "explanation": "内耳の半規管や耳石器で感知される頭部の動き（平衡感覚情報）は、眼球を適切に動かす前庭動眼反射を引き起こし、運動中の視界安定化に不可欠である。"
-}
+  },
+  {
+    "question": "中耳に存在する耳小骨を、鼓膜側から内耳側へ正しい順序で並べたものはどれか。",
+    "options": [
+      "ツチ骨 → キヌタ骨 → アブミ骨",
+      "アブミ骨 → キヌタ骨 → ツチ骨",
+      "キヌタ骨 → ツチ骨 → アブミ骨",
+      "ツチ骨 → アブミ骨 → キヌタ骨"
+    ],
+    "answer": 0,
+    "explanation": "鼓膜の振動は、鼓膜に付着するツチ骨→キヌタ骨→アブミ骨の順に伝わり、アブミ骨底が前庭窓（卵円窓）を振動させて内耳に音を伝える。"
+  },
+  {
+    "question": "網膜上で視細胞が存在せず、視野の中で盲点となる部位はどれか。",
+    "options": [
+      "中心窩",
+      "黄斑部",
+      "視神経乳頭",
+      "毛様体"
+    ],
+    "answer": 2,
+    "explanation": "視神経乳頭（視神経円板）では視神経線維が眼球を出るため視細胞が存在せず、生理的な盲点（マリオット盲点）となる。中心窩は逆に視細胞（錐体）が最も密に存在し、最も鮮明な視覚を担う。"
+  },
+  {
+    "question": "網膜で最も視力が高く、色を識別する錐体細胞が密集している部位はどれか。",
+    "options": [
+      "視神経乳頭",
+      "中心窩",
+      "毛様体",
+      "脈絡膜"
+    ],
+    "answer": 1,
+    "explanation": "中心窩は黄斑部の中央にあり、錐体細胞が密に分布するため、最も高い解像度と色覚を担う。読書や顔認識など精細な視覚はここで処理される。"
+  },
+  {
+    "question": "眼房水を産生し、また水晶体の厚みを調節して遠近調節に関わる構造はどれか。",
+    "options": [
+      "角膜",
+      "虹彩",
+      "毛様体",
+      "強膜"
+    ],
+    "answer": 2,
+    "explanation": "毛様体は眼房水を産生するとともに、毛様体筋の収縮・弛緩によりチン小帯（毛様体小帯）を介して水晶体の厚みを変え、遠近調節（近見時に水晶体が厚くなる）を行う。"
+  },
+  {
+    "question": "蝸牛管内にあり、音の振動を感知する聴覚の受容器はどれか。",
+    "options": [
+      "ラセン器（コルチ器）",
+      "平衡斑",
+      "膨大部稜",
+      "耳石膜"
+    ],
+    "answer": 0,
+    "explanation": "蝸牛管の基底膜上にあるラセン器（コルチ器）には有毛細胞があり、音の周波数に応じた部位（基底回転＝高音、頂回転＝低音）が振動して聴覚受容が起こる。平衡斑と膨大部稜は平衡感覚の受容器である。"
+  }
 ]
 ;
 
@@ -393,38 +448,6 @@
   }
 }
 
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-  explanationEl.style.opacity = '0'; // 解説のopacityをリセット
-}
-
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-}
     function nextQuestion() {
       const selectedOption = document.querySelector('.option.selected');
       if (selectedOption === null) {

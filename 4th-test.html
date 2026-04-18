@@ -287,6 +287,61 @@
     ],
     "answer": 1,
     "explanation": "ランゲルハンス島（膵島）はインスリンやグルカゴンなどのホルモンを分泌する膵臓の内分泌部位である。"
+  },
+  {
+    "question": "嚥下時に喉頭口を塞ぎ、食物が気道に入らないようにする構造はどれか。",
+    "options": [
+      "口蓋垂",
+      "口蓋扁桃",
+      "喉頭蓋",
+      "舌根"
+    ],
+    "answer": 2,
+    "explanation": "嚥下第2相（咽頭相）では、喉頭蓋が後下方に倒れて喉頭口を塞ぐとともに声門が閉鎖し、食塊は食道へ送られる。この機能が低下すると誤嚥性肺炎のリスクが高まる。"
+  },
+  {
+    "question": "胃の区分を噴門側から幽門側へ正しい順序に並べたものはどれか。",
+    "options": [
+      "噴門部 → 幽門部 → 胃体部 → 胃底部",
+      "噴門部 → 胃底部 → 胃体部 → 幽門部",
+      "胃底部 → 噴門部 → 胃体部 → 幽門部",
+      "噴門部 → 胃体部 → 胃底部 → 幽門部"
+    ],
+    "answer": 1,
+    "explanation": "食物の流れは食道→噴門→胃底部（ドーム状の上部）→胃体部（中央部、蠕動で混和・粉砕）→角切痕→幽門部→十二指腸の順である。"
+  },
+  {
+    "question": "肝門を通過する構造物の組合せとして正しいのはどれか。",
+    "options": [
+      "下大静脈・肝静脈・総胆管",
+      "固有肝動脈・門脈・総胆管",
+      "上腸間膜動脈・脾静脈・膵管",
+      "腹腔動脈・奇静脈・リンパ管"
+    ],
+    "answer": 1,
+    "explanation": "肝門では固有肝動脈（酸素の多い動脈血）、門脈（消化管からの栄養に富む静脈血）、総胆管（胆汁の排出路）の3本が出入りする。下大静脈は肝臓の後面を通り、肝静脈を介して肝の血液を受け取るが肝門は通らない。"
+  },
+  {
+    "question": "総胆管と主膵管が合流し、十二指腸下行部に開口する部位はどれか。",
+    "options": [
+      "幽門",
+      "ファーター乳頭（大十二指腸乳頭）",
+      "トライツ靭帯",
+      "回盲弁"
+    ],
+    "answer": 1,
+    "explanation": "総胆管と主膵管は十二指腸下行部のファーター乳頭（大十二指腸乳頭）で合流して開口し、オッディ括約筋によって胆汁・膵液の排出が調節される。"
+  },
+  {
+    "question": "小腸の一部である回腸末端が流入する大腸の部位はどれか。",
+    "options": [
+      "上行結腸",
+      "盲腸",
+      "S状結腸",
+      "直腸"
+    ],
+    "answer": 1,
+    "explanation": "回腸末端は盲腸に流入し、その移行部に回盲弁（バウヒン弁）がある。盲腸からは虫垂が突出する。"
   }
 ]
 ;
@@ -371,38 +426,6 @@
   }
 }
 
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-  explanationEl.style.opacity = '0'; // 解説のopacityをリセット
-}
-
-function loadQuestion() {
-  const question = quizData[currentQuestion];
-  document.getElementById('question').textContent = question.question;
-
-  shuffledOptions = shuffleArray([...question.options]);
-  const optionsHtml = shuffledOptions.map((option, index) => `
-    <div class="option" onclick="selectOption(${index})">${option}</div>
-  `).join('');
-
-  document.getElementById('options').innerHTML = optionsHtml;
-
-  // 解説のリセット
-  const explanationEl = document.getElementById('explanation');
-  explanationEl.style.display = 'none'; // 解説を非表示に
-}
     function nextQuestion() {
       const selectedOption = document.querySelector('.option.selected');
       if (selectedOption === null) {
