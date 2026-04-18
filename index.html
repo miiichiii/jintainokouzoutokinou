@@ -143,6 +143,41 @@
       z-index: 1;
     }
 
+    .hero-skull {
+      position: absolute;
+      right: 88px;
+      top: 78px;
+      width: 24px;
+      height: 24px;
+      color: rgba(19, 54, 101, 0.84);
+      transform: scale(8);
+      transform-origin: top right;
+      image-rendering: pixelated;
+      z-index: 1;
+      pointer-events: none;
+      filter: drop-shadow(0 10px 18px rgba(63, 89, 135, 0.16));
+    }
+
+    .hero-skull::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(currentColor 0 0) 8px 0/8px 4px no-repeat,
+        linear-gradient(currentColor 0 0) 4px 4px/16px 4px no-repeat,
+        linear-gradient(currentColor 0 0) 0 8px/24px 4px no-repeat,
+        linear-gradient(currentColor 0 0) 0 12px/24px 4px no-repeat,
+        linear-gradient(currentColor 0 0) 4px 16px/16px 4px no-repeat,
+        linear-gradient(currentColor 0 0) 8px 20px/8px 4px no-repeat,
+        radial-gradient(circle, transparent 48%, rgba(255, 255, 255, 0.88) 50%) 6px 8px/4px 4px no-repeat,
+        radial-gradient(circle, transparent 48%, rgba(255, 255, 255, 0.88) 50%) 14px 8px/4px 4px no-repeat,
+        linear-gradient(rgba(255, 255, 255, 0.88) 0 0) 10px 14px/4px 2px no-repeat,
+        linear-gradient(rgba(255, 255, 255, 0.88) 0 0) 7px 18px/2px 4px no-repeat,
+        linear-gradient(rgba(255, 255, 255, 0.88) 0 0) 11px 18px/2px 4px no-repeat,
+        linear-gradient(rgba(255, 255, 255, 0.88) 0 0) 15px 18px/2px 4px no-repeat;
+      border-radius: 3px;
+    }
+
     .hero-lead {
       margin: 0;
       max-width: 720px;
@@ -603,6 +638,12 @@
         grid-template-columns: 1fr;
       }
 
+      .hero-skull {
+        right: 46px;
+        top: 40px;
+        transform: scale(6);
+      }
+
       .hero-mini-grid,
       .panel-list,
       .welcome-stats {
@@ -646,6 +687,7 @@
         <div class="eyebrow">Human Anatomy Quiz</div>
         <h1>人体の構造と機能<br>確認テスト</h1>
       </div>
+      <div class="hero-skull" aria-hidden="true"></div>
     </section>
 
     <section id="welcome-panel" class="panel" style="display: none;">
