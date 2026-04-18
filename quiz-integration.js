@@ -3,6 +3,7 @@
     {
       liffId: "",
       apiBaseUrl: "https://line-anatomy-bot.onrender.com",
+      quizSet: "jintainokouzoutokinou",
     },
     window.QUIZ_RUNTIME_CONFIG || {}
   );
@@ -105,6 +106,46 @@
     return `${value}`;
   }
 
+  function formatClearedQuizLabels(labels) {
+    if (!Array.isArray(labels) || labels.length === 0) {
+      return "まだありません";
+    }
+    return labels.join(" / ");
+  }
+
+  function getQuizSet() {
+    const quizSet = String(config.quizSet || "jintainokouzoutokinou").trim();
+    return quizSet || "jintainokouzoutokinou";
+  }
+
+  function getApiBaseUrl() {
+    return String(config.apiBaseUrl || "").replace(/\/$/, "");
+  }
+
+  async function fetchProgressSummary(accessToken) {
+    const apiBaseUrl = getApiBaseUrl();
+    if (!apiBaseUrl || !accessToken) {
+      return null;
+    }
+
+    const response = await fetch(`${apiBaseUrl}/quiz_api/progress`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        line_access_token: accessToken,
+        quiz_set: getQuizSet(),
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      return null;
+    }
+    return data;
+  }
+
   async function initLiff() {
     if (state.initPromise) {
       return state.initPromise;
@@ -184,7 +225,7 @@
       return { ok: false };
     }
 
-    const apiBaseUrl = String(config.apiBaseUrl || "").replace(/\/$/, "");
+    const apiBaseUrl = getApiBaseUrl();
     if (!apiBaseUrl) {
       setResult("API の接続先が設定されていません。", "error");
       return { ok: false };
@@ -200,6 +241,7 @@
         },
         body: JSON.stringify({
           line_access_token: accessToken,
+          quiz_set: getQuizSet(),
           quiz_no: quizNo,
           quiz_title: result.quizTitle || document.title,
           score: result.score,
@@ -238,6 +280,17 @@
       } else {
         progressLines.push(`<p>合格基準は ${PASS_PERCENTAGE}% 以上です。次の挑戦で更新を狙ってください。</p>`);
       }
+      if (typeof data.total_attempts === "number") {
+        progressLines.push(
+          `<p>通算 ${data.total_attempts} 回挑戦 / クリア済み ${data.cleared_quizzes} / ${data.total_quizzes} 回 / 満点 ${data.perfect_clears} 回</p>`
+        );
+      }
+      if (Array.isArray(data.cleared_quiz_labels)) {
+        progressLines.push(`<p>クリア済み: ${formatClearedQuizLabels(data.cleared_quiz_labels)}</p>`);
+      }
+      if (data.motivation_title) {
+        progressLines.push(`<p>${data.motivation_title}: ${data.motivation_message}</p>`);
+      }
 
       const savedMessage = data.passed
         ? `<p><strong>${data.name}さんの結果を記録しました。</strong></p>${progressLines.join("")}`
@@ -261,7 +314,9 @@
   }
 
   window.quizIntegration = {
+    fetchProgressSummary,
     getQuizNo,
+    getQuizSet,
     initLiff,
     submitQuizResult,
     resetResultMessage,

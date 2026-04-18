@@ -292,10 +292,73 @@
     }
 
     .welcome-name {
-      margin-top: 12px;
+      margin-top: 2px;
       color: #143f82;
-      font-size: 1.05rem;
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .welcome-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(44, 123, 229, 0.1);
+      color: #19407f;
+      font-size: 0.82rem;
       font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+    }
+
+    .welcome-message {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    .welcome-cleared {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid rgba(84, 104, 142, 0.1);
+      color: #324155;
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .welcome-cleared strong {
+      color: #173665;
+    }
+
+    .welcome-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .welcome-stat {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(84, 104, 142, 0.1);
+      box-shadow: 0 10px 24px rgba(84, 101, 140, 0.08);
+    }
+
+    .welcome-stat-label {
+      font-size: 0.8rem;
+      color: #66758d;
+    }
+
+    .welcome-stat-value {
+      margin-top: 8px;
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: #173665;
     }
 
     .panel-copy {
@@ -503,7 +566,8 @@
       }
 
       .hero-mini-grid,
-      .panel-list {
+      .panel-list,
+      .welcome-stats {
         grid-template-columns: 1fr;
       }
     }
@@ -547,7 +611,28 @@
     </section>
 
     <section id="welcome-panel" class="panel" style="display: none;">
+      <div id="welcome-badge" class="welcome-badge" style="display: none;"></div>
       <div id="welcome-name" class="welcome-name" style="display: none;"></div>
+      <div id="welcome-message" class="welcome-message" style="display: none;"></div>
+      <div id="welcome-cleared-list" class="welcome-cleared" style="display: none;"></div>
+      <div id="welcome-stats" class="welcome-stats" style="display: none;">
+        <div class="welcome-stat">
+          <div class="welcome-stat-label">通算挑戦</div>
+          <div id="welcome-total-attempts" class="welcome-stat-value">0</div>
+        </div>
+        <div class="welcome-stat">
+          <div class="welcome-stat-label">クリア済み</div>
+          <div id="welcome-cleared-count" class="welcome-stat-value">0 / 0</div>
+        </div>
+        <div class="welcome-stat">
+          <div class="welcome-stat-label">満点クリア</div>
+          <div id="welcome-perfect" class="welcome-stat-value">0</div>
+        </div>
+        <div class="welcome-stat">
+          <div class="welcome-stat-label">最高到達率</div>
+          <div id="welcome-best" class="welcome-stat-value">0%</div>
+        </div>
+      </div>
     </section>
 
     <div class="section-title">
@@ -583,7 +668,17 @@
     const upcomingGrid = document.getElementById("upcoming-grid");
     const liveCount = document.getElementById("live-count");
     const welcomePanel = document.getElementById("welcome-panel");
+    const welcomeBadge = document.getElementById("welcome-badge");
     const welcomeName = document.getElementById("welcome-name");
+    const welcomeMessage = document.getElementById("welcome-message");
+    const welcomeClearedList = document.getElementById("welcome-cleared-list");
+    const welcomeStats = document.getElementById("welcome-stats");
+    const welcomeTotalAttempts = document.getElementById("welcome-total-attempts");
+    const welcomeCleared = document.getElementById("welcome-cleared-count");
+    const welcomePerfect = document.getElementById("welcome-perfect");
+    const welcomeBest = document.getElementById("welcome-best");
+    const apiBaseUrl = String((window.QUIZ_RUNTIME_CONFIG || {}).apiBaseUrl || "").replace(/\/$/, "");
+    const quizSet = String((window.QUIZ_RUNTIME_CONFIG || {}).quizSet || "jintainokouzoutokinou").trim();
     const liffId = String((window.QUIZ_RUNTIME_CONFIG || {}).liffId || "").trim();
 
     function createCard(lesson) {
@@ -616,6 +711,55 @@
       return `https://liff.line.me/${liffId}/${path}`;
     }
 
+    function formatClearedQuizLabels(labels) {
+      if (!Array.isArray(labels) || labels.length === 0) {
+        return "まだありません";
+      }
+      return labels.join(" / ");
+    }
+
+    async function loadWelcomeProgress() {
+      if (!window.liff || !window.liff.getAccessToken || !apiBaseUrl) {
+        return;
+      }
+
+      const accessToken = window.liff.getAccessToken();
+      if (!accessToken) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/quiz_api/progress`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            line_access_token: accessToken,
+            quiz_set: quizSet || "jintainokouzoutokinou"
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) {
+          return;
+        }
+
+        welcomeBadge.textContent = data.motivation_title || "Progress";
+        welcomeBadge.style.display = "inline-flex";
+        welcomeMessage.textContent = data.motivation_message || "";
+        welcomeMessage.style.display = "block";
+        welcomeClearedList.innerHTML = `<strong>クリア済み:</strong> ${formatClearedQuizLabels(data.cleared_quiz_labels)}`;
+        welcomeClearedList.style.display = "block";
+        welcomeStats.style.display = "grid";
+        welcomeTotalAttempts.textContent = String(data.total_attempts ?? 0);
+        welcomeCleared.textContent = `${data.cleared_quizzes ?? 0} / ${data.total_quizzes ?? 0}`;
+        welcomePerfect.textContent = String(data.perfect_clears ?? 0);
+        welcomeBest.textContent = `${data.best_percentage ?? 0}%`;
+      } catch (error) {
+        console.error("Progress summary fetch failed:", error);
+      }
+    }
+
     async function initIndexLiff() {
       if (!liffId || !window.liff) {
         return;
@@ -627,30 +771,30 @@
           withLoginOnExternalBrowser: true
         });
 
+        const params = new URLSearchParams(window.location.search);
+        const state = params.get("liff.state");
+        if (state) {
+          const targetUrl = new URL(decodeURIComponent(state), window.location.href);
+          const currentUrl = new URL(window.location.href);
+          const sameTarget =
+            targetUrl.pathname === currentUrl.pathname &&
+            targetUrl.search === currentUrl.search &&
+            targetUrl.hash === currentUrl.hash;
+
+          if (!sameTarget) {
+            window.location.replace(targetUrl.toString());
+            return;
+          }
+        }
+
         if (window.liff.isLoggedIn()) {
           const profile = await window.liff.getProfile();
           if (profile && profile.displayName) {
             welcomePanel.style.display = "block";
             welcomeName.textContent = `${profile.displayName}さん、ようこそ`;
             welcomeName.style.display = "block";
+            await loadWelcomeProgress();
           }
-        }
-
-        const params = new URLSearchParams(window.location.search);
-        const state = params.get("liff.state");
-        if (!state) {
-          return;
-        }
-
-        const targetUrl = new URL(decodeURIComponent(state), window.location.href);
-        const currentUrl = new URL(window.location.href);
-        const sameTarget =
-          targetUrl.pathname === currentUrl.pathname &&
-          targetUrl.search === currentUrl.search &&
-          targetUrl.hash === currentUrl.hash;
-
-        if (!sameTarget) {
-          window.location.replace(targetUrl.toString());
         }
       } catch (error) {
         console.error("LIFF init failed on index page:", error);
