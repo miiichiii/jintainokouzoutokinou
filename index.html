@@ -143,28 +143,6 @@
       z-index: 1;
     }
 
-    .hero-skull-shell {
-      position: absolute;
-      right: 74px;
-      top: 42px;
-      z-index: 1;
-      pointer-events: none;
-      padding: 20px 22px;
-      border-radius: 26px;
-      background: rgba(255, 255, 255, 0.32);
-      border: 1px solid rgba(255, 255, 255, 0.42);
-      box-shadow: 0 18px 34px rgba(77, 97, 141, 0.14);
-      backdrop-filter: blur(10px);
-    }
-
-    .hero-skull-shell canvas {
-      display: block;
-      width: 132px;
-      height: 108px;
-      image-rendering: pixelated;
-      filter: drop-shadow(0 12px 22px rgba(64, 88, 138, 0.18));
-    }
-
     .lesson-icon {
       display: flex;
       justify-content: flex-end;
@@ -640,12 +618,6 @@
         grid-template-columns: 1fr;
       }
 
-      .hero-skull {
-        right: 46px;
-        top: 40px;
-        transform: scale(6);
-      }
-
       .hero-mini-grid,
       .panel-list,
       .welcome-stats {
@@ -671,18 +643,6 @@
         border-radius: 22px;
       }
 
-      .hero-skull-shell {
-        right: 20px;
-        top: 18px;
-        padding: 12px 14px;
-        border-radius: 20px;
-      }
-
-      .hero-skull-shell canvas {
-        width: 88px;
-        height: 72px;
-      }
-
       .section-title {
         display: block;
       }
@@ -700,9 +660,6 @@
       <div class="hero-copy">
         <div class="eyebrow">Human Anatomy Quiz</div>
         <h1>人体の構造と機能<br>確認テスト</h1>
-      </div>
-      <div class="hero-skull-shell" aria-hidden="true">
-        <canvas id="icon-skull"></canvas>
       </div>
     </section>
 
@@ -750,7 +707,7 @@
   <script>
     const lessons = [
       { no: 1, title: "解剖学の基礎", href: "1st-test.html", published: true, icon: "bone" },
-      { no: 2, title: "心臓と循環の基礎", href: "2nd-test.html", published: false, icon: "heart" },
+      { no: 2, title: "心臓と循環の基礎", href: "2nd-test.html", published: true, icon: "heart" },
       { no: 3, title: "血管・循環と呼吸器", href: "3rd-test.html", published: false, icon: "lungs" },
       { no: 4, title: "消化器", href: "4th-test.html", published: false, icon: "stomach" },
       { no: 5, title: "感覚器", href: "5th-test.html", published: false, icon: "eye" },
@@ -969,9 +926,6 @@
     }
 
     function renderVisibleIcons() {
-      const heroCanvas = document.getElementById("icon-skull");
-      renderArrayToCanvas(heroCanvas, icons.skull);
-
       document.querySelectorAll("[data-pixel-icon]").forEach((canvas) => {
         const iconName = canvas.dataset.pixelIcon;
         renderArrayToCanvas(canvas, icons[iconName]);
