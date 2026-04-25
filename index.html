@@ -708,8 +708,8 @@
     const lessons = [
       { no: 1, title: "解剖学の基礎", href: "1st-test.html", published: true, icon: "bone" },
       { no: 2, title: "心臓と循環の基礎", href: "2nd-test.html", published: true, icon: "heart" },
-      { no: 3, title: "血管・循環と呼吸器", href: "3rd-test.html", published: false, icon: "lungs" },
-      { no: 4, title: "消化器", href: "4th-test.html", published: false, icon: "stomach" },
+      { no: 3, title: "血管・循環と呼吸器", href: "3rd-test.html", published: false, publishAt: "2026-04-27T14:50:00+09:00", icon: "lungs" },
+      { no: 4, title: "消化器", href: "4th-test.html", published: false, publishAt: "2026-04-27T16:30:00+09:00", icon: "stomach" },
       { no: 5, title: "感覚器", href: "5th-test.html", published: false, icon: "eye" },
       { no: 6, title: "神経系", href: "6th-test.html", published: false, icon: "brain" },
       { no: 7, title: "泌尿器・生殖器", href: "7th-test.html", published: false, icon: "kidneys" },
@@ -932,6 +932,32 @@
       });
     }
 
+    function isLessonPublished(lesson) {
+      if (lesson.published) {
+        return true;
+      }
+      if (!lesson.publishAt) {
+        return false;
+      }
+      const publishTime = new Date(lesson.publishAt);
+      return !Number.isNaN(publishTime.getTime()) && Date.now() >= publishTime.getTime();
+    }
+
+    function getLessonBuckets() {
+      const published = [];
+      const upcoming = [];
+
+      lessons.forEach((lesson) => {
+        if (isLessonPublished(lesson)) {
+          published.push(lesson);
+        } else {
+          upcoming.push(lesson);
+        }
+      });
+
+      return { published, upcoming };
+    }
+
     function createCard(lesson) {
       const article = document.createElement("article");
       const isCleared = clearedQuizNumbers.has(lesson.no);
@@ -1032,6 +1058,8 @@
     }
 
     function renderLessonCards() {
+      const { published, upcoming } = getLessonBuckets();
+
       if (published.length === 0) {
         publishedGrid.innerHTML = '<div class="empty">現在公開中の確認テストはありません。</div>';
       } else {
@@ -1046,6 +1074,7 @@
         upcoming.forEach((lesson) => upcomingGrid.appendChild(createCard(lesson)));
       }
       renderVisibleIcons();
+      liveCount.textContent = `${published.length}件公開中`;
     }
 
     async function loadWelcomeProgress() {
@@ -1135,10 +1164,6 @@
       }
     }
 
-    const published = lessons.filter((lesson) => lesson.published);
-    const upcoming = lessons.filter((lesson) => !lesson.published);
-
-    liveCount.textContent = `${published.length}件公開中`;
     renderLessonCards();
 
     initIndexLiff();
