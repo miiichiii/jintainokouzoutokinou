@@ -960,12 +960,13 @@
 
     function createCard(lesson) {
       const article = document.createElement("article");
+      const isAvailable = isLessonPublished(lesson);
       const isCleared = clearedQuizNumbers.has(lesson.no);
-      article.className = `card ${lesson.published ? "available" : "locked"}${isCleared ? " cleared" : ""}`;
+      article.className = `card ${isAvailable ? "available" : "locked"}${isCleared ? " cleared" : ""}`;
 
-      const statusClass = lesson.published ? "live" : "lock";
-      const statusText = lesson.published ? "公開中" : "準備中";
-      const action = lesson.published
+      const statusClass = isAvailable ? "live" : "lock";
+      const statusText = isAvailable ? "公開中" : "準備中";
+      const action = isAvailable
         ? `<a class="button" href="${buildLessonUrl(lesson.href)}">第${lesson.no}回を開く</a>`
         : `<div class="button-muted">公開までお待ちください</div>`;
       const clearedBadge = isCleared
@@ -1077,6 +1078,30 @@
       liveCount.textContent = `${published.length}件公開中`;
     }
 
+    let publishRefreshTimer = null;
+
+    function scheduleNextPublishRefresh() {
+      if (publishRefreshTimer) {
+        clearTimeout(publishRefreshTimer);
+      }
+
+      const now = Date.now();
+      const nextPublishTime = lessons
+        .filter((lesson) => !isLessonPublished(lesson) && lesson.publishAt)
+        .map((lesson) => new Date(lesson.publishAt).getTime())
+        .filter((time) => !Number.isNaN(time) && time > now)
+        .sort((a, b) => a - b)[0];
+
+      if (!nextPublishTime) {
+        return;
+      }
+
+      publishRefreshTimer = window.setTimeout(() => {
+        renderLessonCards();
+        scheduleNextPublishRefresh();
+      }, Math.min(nextPublishTime - now + 1000, 2147483647));
+    }
+
     async function loadWelcomeProgress() {
       if (!window.liff || !window.liff.getAccessToken || !apiBaseUrl) {
         return;
@@ -1165,6 +1190,7 @@
     }
 
     renderLessonCards();
+    scheduleNextPublishRefresh();
 
     initIndexLiff();
   </script>
