@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第9回確認テスト（人体の構造と機能）</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      padding: 20px;
+      margin: 0;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1, h2 { font-family: 'Noto Sans JP', sans-serif; font-weight: 700; }
+    .quiz-container, .result-card {
+      background-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .question { font-size: 1.3em; margin-bottom: 20px; color: #1d1d1f; }
+    .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    .option {
+      background-color: rgba(255, 255, 255, 0.7);
+      border: none;
+      border-radius: 16px;
+      padding: 15px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s ease 0.1s, transform 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .option:hover, .option.disabled { background: linear-gradient(135deg, #a8edea, #fed6e3); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); }
+    .option.selected { background-color: #007aff; color: #fff; }
+    .option.disabled { pointer-events: none; }
+    .option.correct { background: linear-gradient(135deg, #34c759, #a8e6cf); color: #fff; }
+    .option.incorrect { background: linear-gradient(135deg, #ff3b30, #ff9a8b); color: #fff; }
+    .explanation {
+      margin-top: 20px;
+      font-size: 1em;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-left: 5px solid #4caf50;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    .nav-button {
+      background: linear-gradient(135deg, #007aff, #5ac8fa);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      margin-top: 20px;
+      width: 100%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .nav-button:hover { background: linear-gradient(135deg, #005bb5, #4aa0d3); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); }
+    .result-status { font-weight: bold; margin-bottom: 10px; }
+    .correct { color: #34c759; }
+    .incorrect { color: #ff3b30; }
+    #attendance-link {
+      background-color: #34c759;
+      color: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align: center;">第9回確認テスト（人体の構造と機能）</h1>
+    <div id="line-auth-status" class="result-card" style="display: none;"></div>
+    <div id="quiz-container" class="quiz-container">
+      <div id="quiz-content">
+        <div id="question" class="question"></div>
+        <div id="options" class="options"></div>
+        <div id="explanation" class="explanation"></div>
+      </div>
+      <button id="next" class="nav-button" onclick="nextQuestion()">次の問題</button>
+    </div>
+    <div id="result-container"></div>
+    <div id="attendance-link"></div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "有性生殖の説明として最も適切なものはどれか。",
+        options: ["体細胞が単独で分裂する生殖", "精子と卵が関わり受精卵をつくる生殖", "尿を作る仕組み", "血液を濾過する仕組み"],
+        answer: 1,
+        explanation: "有性生殖では精子と卵が関わり、受精によって受精卵が形成される。"
+      },
+      {
+        question: "骨盤腔内に位置する臓器の組み合わせとして最も適切なものはどれか。",
+        options: ["肺・心臓・気管", "胃・肝臓・脾臓", "膀胱・直腸・生殖器", "腎臓・副腎・横隔膜"],
+        answer: 2,
+        explanation: "骨盤腔には膀胱、直腸、生殖器などが位置する。"
+      },
+      {
+        question: "女性生殖器の組み合わせとして適切なものはどれか。",
+        options: ["卵巣・卵管・子宮・腟", "精巣・精管・前立腺・陰茎", "腎臓・尿管・膀胱・尿道", "心房・心室・動脈・静脈"],
+        answer: 0,
+        explanation: "女性生殖器には卵巣、卵管、子宮、腟などが含まれる。"
+      },
+      {
+        question: "卵巣の主な働きとして正しいものはどれか。",
+        options: ["尿をためる", "精子を成熟させる", "卵子と女性ホルモンを産生する", "胆汁を分泌する"],
+        answer: 2,
+        explanation: "卵巣は卵子を形成し、エストロゲンなどの女性ホルモンを分泌する。"
+      },
+      {
+        question: "卵巣と子宮をつなぎ、受精が起こる部位として重要な管はどれか。",
+        options: ["尿管", "卵管", "精管", "尿道"],
+        answer: 1,
+        explanation: "卵管は卵巣から子宮へ卵を運び、受精の場となることが多い。"
+      },
+      {
+        question: "受精卵が着床し、胎児が発育する器官はどれか。",
+        options: ["卵巣", "膀胱", "腟", "子宮"],
+        answer: 3,
+        explanation: "子宮は受精卵が着床し、妊娠中に胎児が発育する器官である。"
+      },
+      {
+        question: "子宮と外陰部を連絡する管状の器官はどれか。",
+        options: ["腟", "尿管", "精管", "卵巣"],
+        answer: 0,
+        explanation: "腟は子宮頚部から外陰部へ続く管状の器官である。"
+      },
+      {
+        question: "子宮を支持し、子宮・卵管・卵巣の位置関係に関わる膜状構造はどれか。",
+        options: ["横隔膜", "腎筋膜", "子宮広間膜", "胸膜"],
+        answer: 2,
+        explanation: "子宮広間膜は骨盤内で子宮や付属器の位置関係に関わる膜状構造である。"
+      },
+      {
+        question: "男性生殖器の組み合わせとして適切なものはどれか。",
+        options: ["卵巣・卵管・子宮・腟", "精巣・精巣上体・精管・前立腺", "腎臓・尿管・膀胱・尿道", "蝸牛・前庭・半規管・鼓膜"],
+        answer: 1,
+        explanation: "男性生殖器には精巣、精巣上体、精管、前立腺などが含まれる。"
+      },
+      {
+        question: "精巣の主な働きとして正しいものはどれか。",
+        options: ["精子とテストステロンを産生する", "卵子を産生する", "尿をためる", "胆汁を作る"],
+        answer: 0,
+        explanation: "精巣は精子を作り、男性ホルモンであるテストステロンを分泌する。"
+      },
+      {
+        question: "精巣内で精子が作られる主な部位はどれか。",
+        options: ["腎小体", "卵管采", "精細管", "膀胱三角"],
+        answer: 2,
+        explanation: "精細管では精子形成が行われる。"
+      },
+      {
+        question: "精子の成熟や貯蔵に関わり、精巣に接して位置する構造はどれか。",
+        options: ["前立腺", "精巣上体", "卵巣", "子宮"],
+        answer: 1,
+        explanation: "精巣上体は精子の成熟や一時的な貯蔵に関わる。"
+      },
+      {
+        question: "精巣上体から精子を運ぶ管はどれか。",
+        options: ["卵管", "尿管", "総胆管", "精管"],
+        answer: 3,
+        explanation: "精管は精巣上体から精子を運ぶ管である。"
+      },
+      {
+        question: "膀胱の下に位置し、男性尿道を取り囲む腺はどれか。",
+        options: ["前立腺", "副腎", "甲状腺", "上皮小体"],
+        answer: 0,
+        explanation: "前立腺は膀胱の下に位置し、男性尿道を取り囲む。"
+      },
+      {
+        question: "精液の液体成分の形成に関わる男性副生殖腺として適切なものはどれか。",
+        options: ["涙腺", "耳下腺", "精嚢", "松果体"],
+        answer: 2,
+        explanation: "精嚢は精液の液体成分の形成に関わる男性副生殖腺である。"
+      },
+      {
+        question: "陰茎の勃起に関わる海綿体として適切なものはどれか。",
+        options: ["腎錐体", "陰茎海綿体", "腎小体", "平衡斑"],
+        answer: 1,
+        explanation: "陰茎海綿体は血液を含んで膨張し、勃起に関わる。"
+      },
+      {
+        question: "精巣を収め、温度調節にも関わる外部構造はどれか。",
+        options: ["陰嚢", "子宮", "卵管", "膀胱"],
+        answer: 0,
+        explanation: "陰嚢は精巣を収め、精子形成に適した温度環境を保つことに関わる。"
+      },
+      {
+        question: "胎児期に精巣が腹部から陰嚢へ移動する現象はどれか。",
+        options: ["排卵", "濾過", "精巣下降", "再吸収"],
+        answer: 2,
+        explanation: "精巣下降は精巣が腹部から陰嚢へ移動する発生過程である。"
+      },
+      {
+        question: "女性と男性の骨盤内臓器の配置について一般に正しいものはどれか。",
+        options: ["直腸は最も前方にある", "膀胱は直腸より後方にある", "生殖器は常に骨盤腔外にある", "膀胱は前方、直腸は後方に位置する"],
+        answer: 3,
+        explanation: "正中矢状断では、膀胱が前方、直腸が後方に位置し、その間に生殖器が配置される。"
+      },
+      {
+        question: "女性骨盤の正中矢状断で、子宮は一般にどの臓器の間に位置するか。",
+        options: ["膀胱と直腸の間", "肺と心臓の間", "腎臓と副腎の間", "胃と肝臓の間"],
+        answer: 0,
+        explanation: "女性骨盤では、子宮は前方の膀胱と後方の直腸の間に位置する。"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let userAnswers = [];
+    let shuffledOptions = [];
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function loadQuestion() {
+      const question = quizData[currentQuestion];
+      document.getElementById('question').textContent = question.question;
+      shuffledOptions = shuffleArray([...question.options]);
+      document.getElementById('options').innerHTML = shuffledOptions.map((option, index) => `
+        <div class="option" onclick="selectOption(${index})">${option}</div>
+      `).join('');
+      const explanationEl = document.getElementById('explanation');
+      explanationEl.style.opacity = '0';
+      explanationEl.style.display = 'none';
+    }
+
+    function selectOption(index) {
+      const options = document.querySelectorAll('.option');
+      if (options[index].classList.contains('disabled')) return;
+      options.forEach(option => option.classList.add('disabled'));
+      options[index].classList.add('selected');
+
+      const question = quizData[currentQuestion];
+      const selectedAnswer = question.options.indexOf(shuffledOptions[index]);
+      userAnswers[currentQuestion] = selectedAnswer;
+      options.forEach((option, i) => {
+        const originalIndex = question.options.indexOf(shuffledOptions[i]);
+        if (originalIndex === question.answer) option.classList.add('correct');
+        else if (i === index) option.classList.add('incorrect');
+      });
+
+      const explanationEl = document.getElementById('explanation');
+      explanationEl.textContent = question.explanation;
+      explanationEl.style.display = 'block';
+      setTimeout(() => { explanationEl.style.opacity = '1'; }, 100);
+    }
+
+    function nextQuestion() {
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      score = userAnswers.reduce((total, answer, index) => total + (answer === quizData[index].answer ? 1 : 0), 0);
+      const resultContainer = document.getElementById('result-container');
+      document.getElementById('quiz-container').style.display = 'none';
+      const percentage = (score / quizData.length) * 100;
+      let resultHtml = `
+        <h2>クイズ結果</h2>
+        <p>正解数: ${score} / ${quizData.length}</p>
+        <p>正答率: ${percentage.toFixed(2)}%</p>
+      `;
+
+      quizData.forEach((question, index) => {
+        const isCorrect = userAnswers[index] === question.answer;
+        resultHtml += `
+          <div class="result-card">
+            <h3>問題 ${index + 1}</h3>
+            <p class="result-status ${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? '正解' : '不正解'}</p>
+            <p><strong>質問:</strong> ${question.question}</p>
+            <p><strong>あなたの回答:</strong> ${question.options[userAnswers[index]] || '未回答'}</p>
+            <p><strong>正解:</strong> ${question.options[question.answer]}</p>
+            <p><strong>説明:</strong> ${question.explanation}</p>
+          </div>
+        `;
+      });
+
+      resultHtml += `<button class="nav-button" onclick="restartQuiz()">もう一度挑戦する</button>`;
+      resultHtml += `<button class="nav-button" onclick="goToTopPage()" style="margin-top: 12px; background: linear-gradient(135deg, #64748b, #94a3b8);">トップページに戻る</button>`;
+      resultContainer.innerHTML = resultHtml;
+
+      if (window.quizIntegration) {
+        window.quizIntegration.submitQuizResult({
+          quizNo: window.quizIntegration.getQuizNo(),
+          quizTitle: document.title,
+          score,
+          totalQuestions: quizData.length,
+          userAnswers,
+          quizData
+        });
+      }
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      userAnswers = [];
+      shuffledOptions = [];
+      document.getElementById('quiz-container').style.display = 'block';
+      document.getElementById('result-container').innerHTML = '';
+      if (window.quizIntegration) {
+        window.quizIntegration.resetResultMessage();
+      } else {
+        document.getElementById('attendance-link').style.display = 'none';
+      }
+      loadQuestion();
+    }
+
+    function goToTopPage() {
+      window.location.href = 'index.html';
+    }
+
+    loadQuestion();
+  </script>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="quiz-auth-config.js"></script>
+  <script src="quiz-integration.js"></script>
+</body>
+</html>

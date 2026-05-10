@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第8回確認テスト（人体の構造と機能）</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      padding: 20px;
+      margin: 0;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    h1, h2 { font-family: 'Noto Sans JP', sans-serif; font-weight: 700; }
+    .quiz-container, .result-card {
+      background-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .question { font-size: 1.3em; margin-bottom: 20px; color: #1d1d1f; }
+    .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    .option {
+      background-color: rgba(255, 255, 255, 0.7);
+      border: none;
+      border-radius: 16px;
+      padding: 15px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s ease 0.1s, transform 0.3s ease;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .option:hover, .option.disabled { background: linear-gradient(135deg, #a8edea, #fed6e3); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); }
+    .option.selected { background-color: #007aff; color: #fff; }
+    .option.disabled { pointer-events: none; }
+    .option.correct { background: linear-gradient(135deg, #34c759, #a8e6cf); color: #fff; }
+    .option.incorrect { background: linear-gradient(135deg, #ff3b30, #ff9a8b); color: #fff; }
+    .explanation {
+      margin-top: 20px;
+      font-size: 1em;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-left: 5px solid #4caf50;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    .nav-button {
+      background: linear-gradient(135deg, #007aff, #5ac8fa);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      margin-top: 20px;
+      width: 100%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .nav-button:hover { background: linear-gradient(135deg, #005bb5, #4aa0d3); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); }
+    .result-status { font-weight: bold; margin-bottom: 10px; }
+    .correct { color: #34c759; }
+    .incorrect { color: #ff3b30; }
+    #attendance-link {
+      background-color: #34c759;
+      color: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align: center;">第8回確認テスト（人体の構造と機能）</h1>
+    <div id="line-auth-status" class="result-card" style="display: none;"></div>
+    <div id="quiz-container" class="quiz-container">
+      <div id="quiz-content">
+        <div id="question" class="question"></div>
+        <div id="options" class="options"></div>
+        <div id="explanation" class="explanation"></div>
+      </div>
+      <button id="next" class="nav-button" onclick="nextQuestion()">次の問題</button>
+    </div>
+    <div id="result-container"></div>
+    <div id="attendance-link"></div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "泌尿器系を構成する器官の組み合わせとして最も適切なものはどれか。",
+        options: ["腎臓・尿管・膀胱・尿道", "心臓・動脈・静脈・毛細血管", "胃・小腸・大腸・肝臓", "精巣・卵巣・子宮・腟"],
+        answer: 0,
+        explanation: "泌尿器系は尿をつくる腎臓、尿を運ぶ尿管、尿をためる膀胱、体外へ出す尿道からなる。"
+      },
+      {
+        question: "腎臓が1日に作る原尿量として、講義資料で示された量に最も近いものはどれか。",
+        options: ["約1.5 L", "150 L以上", "約500 mL", "約5 L"],
+        answer: 1,
+        explanation: "資料では腎臓が1日に150 L以上の原尿をつくることが示されている。"
+      },
+      {
+        question: "腎臓で作られた原尿の大部分はどうなるか。",
+        options: ["すべて尿として排出される", "胆汁に変えられる", "再吸収され血液側へ戻る", "肺から排出される"],
+        answer: 2,
+        explanation: "原尿の大部分は尿細管で再吸収され、必要な水や物質が血液側へ戻される。"
+      },
+      {
+        question: "腎機能が失われたときに生命を脅かす異常として資料に示されていたものはどれか。",
+        options: ["高カリウム血症", "低酸素血症のみ", "骨折", "近視"],
+        answer: 0,
+        explanation: "資料では高カリウム血症による心停止など、腎機能喪失の危険性が示されている。"
+      },
+      {
+        question: "腎臓の基本的な機能単位はどれか。",
+        options: ["肝小葉", "肺胞", "ネフロン（腎単位）", "筋線維"],
+        answer: 2,
+        explanation: "ネフロンは腎小体と尿細管からなる腎臓の基本的な機能単位である。"
+      },
+      {
+        question: "腎小体を構成する組み合わせとして正しいものはどれか。",
+        options: ["糸球体とボーマン嚢", "尿管と膀胱", "腎盂と尿道", "腎静脈と副腎"],
+        answer: 0,
+        explanation: "腎小体は毛細血管の塊である糸球体と、それを包むボーマン嚢からなる。"
+      },
+      {
+        question: "血液の濾過が主に行われる構造はどれか。",
+        options: ["尿道", "膀胱三角", "糸球体", "尿管"],
+        answer: 2,
+        explanation: "糸球体では血液が濾過され、原尿が作られる。"
+      },
+      {
+        question: "糸球体濾過装置でフィルター形成に関わる細胞として資料に示されたものはどれか。",
+        options: ["骨芽細胞", "足細胞", "赤血球", "神経細胞"],
+        answer: 1,
+        explanation: "足細胞の足突起が濾過障壁の一部となり、血液の濾過に関わる。"
+      },
+      {
+        question: "腎臓の皮質に多く存在し、血液の濾過に関わる構造はどれか。",
+        options: ["腎小体", "膀胱", "尿道括約筋", "精管"],
+        answer: 0,
+        explanation: "腎小体は主に腎皮質に存在し、血液濾過に関わる。"
+      },
+      {
+        question: "腎臓内部で尿を集め、尿管へ向かわせる漏斗状の部位はどれか。",
+        options: ["腎皮質", "腎錐体", "腎盂", "糸球体"],
+        answer: 2,
+        explanation: "腎盂は腎臓内で尿を集め、尿管へ送る部位である。"
+      },
+      {
+        question: "腎臓から膀胱へ尿を運ぶ管はどれか。",
+        options: ["尿管", "尿道", "卵管", "精管"],
+        answer: 0,
+        explanation: "尿管は腎臓で作られた尿を膀胱へ運ぶ。"
+      },
+      {
+        question: "尿を一時的にためる器官はどれか。",
+        options: ["腎臓", "膀胱", "尿管", "副腎"],
+        answer: 1,
+        explanation: "膀胱は尿を一時的に貯留する器官である。"
+      },
+      {
+        question: "膀胱から体外へ尿を排出する管はどれか。",
+        options: ["尿管", "卵管", "尿道", "総胆管"],
+        answer: 2,
+        explanation: "尿道は膀胱から体外へ尿を導く管である。"
+      },
+      {
+        question: "腎臓で必要な物質を血液側へ戻す過程を何というか。",
+        options: ["分娩", "再吸収", "換気", "受精"],
+        answer: 1,
+        explanation: "再吸収により、水や電解質など必要な物質が尿細管から血液側へ戻る。"
+      },
+      {
+        question: "尿が体外へ出るまでの流れとして正しいものはどれか。",
+        options: ["膀胱 → 腎臓 → 尿管 → 尿道", "尿道 → 尿管 → 膀胱 → 腎臓", "腎臓 → 尿道 → 膀胱 → 尿管", "腎臓 → 尿管 → 膀胱 → 尿道"],
+        answer: 3,
+        explanation: "尿は腎臓で作られ、尿管、膀胱、尿道の順に流れる。"
+      },
+      {
+        question: "腎臓の働きとして最も適切なものはどれか。",
+        options: ["酸素を取り込む", "食物を胃へ送る", "水・電解質・老廃物の調整を行う", "音を感知する"],
+        answer: 2,
+        explanation: "腎臓は水分、電解質、老廃物の調整を通して体内環境の維持に関わる。"
+      },
+      {
+        question: "腎錐体が主に位置する腎臓の領域はどれか。",
+        options: ["腎髄質", "腎皮質", "膀胱粘膜", "尿道海綿体"],
+        answer: 0,
+        explanation: "腎錐体は腎髄質を構成する円錐状の構造である。"
+      },
+      {
+        question: "尿細管と密接に関係し、再吸収された物質を受け取る血管はどれか。",
+        options: ["冠動脈", "尿細管周囲毛細血管", "肺静脈", "門脈"],
+        answer: 1,
+        explanation: "尿細管周囲毛細血管は、尿細管から再吸収された水や物質を受け取る。"
+      },
+      {
+        question: "腎臓の構造説明として最も適切なものはどれか。",
+        options: ["腎皮質の腎小体・糸球体で濾過が始まる", "膀胱の中で原尿が作られる", "尿道は腎臓内部の構造である", "腎小体は肺胞の一部である"],
+        answer: 0,
+        explanation: "腎皮質にある腎小体の糸球体で血液が濾過され、尿生成が始まる。"
+      },
+      {
+        question: "腎臓の説明として誤っているものはどれか。",
+        options: ["血液から尿を作る", "原尿の多くを再吸収する", "ネフロンを機能単位とする", "尿を胆嚢へ送る"],
+        answer: 3,
+        explanation: "尿は腎臓から尿管、膀胱、尿道へ流れる。胆嚢へ送られるわけではない。"
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let userAnswers = [];
+    let shuffledOptions = [];
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function loadQuestion() {
+      const question = quizData[currentQuestion];
+      document.getElementById('question').textContent = question.question;
+      shuffledOptions = shuffleArray([...question.options]);
+      document.getElementById('options').innerHTML = shuffledOptions.map((option, index) => `
+        <div class="option" onclick="selectOption(${index})">${option}</div>
+      `).join('');
+      const explanationEl = document.getElementById('explanation');
+      explanationEl.style.opacity = '0';
+      explanationEl.style.display = 'none';
+    }
+
+    function selectOption(index) {
+      const options = document.querySelectorAll('.option');
+      if (options[index].classList.contains('disabled')) return;
+      options.forEach(option => option.classList.add('disabled'));
+      options[index].classList.add('selected');
+
+      const question = quizData[currentQuestion];
+      const selectedAnswer = question.options.indexOf(shuffledOptions[index]);
+      userAnswers[currentQuestion] = selectedAnswer;
+      options.forEach((option, i) => {
+        const originalIndex = question.options.indexOf(shuffledOptions[i]);
+        if (originalIndex === question.answer) option.classList.add('correct');
+        else if (i === index) option.classList.add('incorrect');
+      });
+
+      const explanationEl = document.getElementById('explanation');
+      explanationEl.textContent = question.explanation;
+      explanationEl.style.display = 'block';
+      setTimeout(() => { explanationEl.style.opacity = '1'; }, 100);
+    }
+
+    function nextQuestion() {
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      score = userAnswers.reduce((total, answer, index) => total + (answer === quizData[index].answer ? 1 : 0), 0);
+      const resultContainer = document.getElementById('result-container');
+      document.getElementById('quiz-container').style.display = 'none';
+      const percentage = (score / quizData.length) * 100;
+      let resultHtml = `
+        <h2>クイズ結果</h2>
+        <p>正解数: ${score} / ${quizData.length}</p>
+        <p>正答率: ${percentage.toFixed(2)}%</p>
+      `;
+
+      quizData.forEach((question, index) => {
+        const isCorrect = userAnswers[index] === question.answer;
+        resultHtml += `
+          <div class="result-card">
+            <h3>問題 ${index + 1}</h3>
+            <p class="result-status ${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? '正解' : '不正解'}</p>
+            <p><strong>質問:</strong> ${question.question}</p>
+            <p><strong>あなたの回答:</strong> ${question.options[userAnswers[index]] || '未回答'}</p>
+            <p><strong>正解:</strong> ${question.options[question.answer]}</p>
+            <p><strong>説明:</strong> ${question.explanation}</p>
+          </div>
+        `;
+      });
+
+      resultHtml += `<button class="nav-button" onclick="restartQuiz()">もう一度挑戦する</button>`;
+      resultHtml += `<button class="nav-button" onclick="goToTopPage()" style="margin-top: 12px; background: linear-gradient(135deg, #64748b, #94a3b8);">トップページに戻る</button>`;
+      resultContainer.innerHTML = resultHtml;
+
+      if (window.quizIntegration) {
+        window.quizIntegration.submitQuizResult({
+          quizNo: window.quizIntegration.getQuizNo(),
+          quizTitle: document.title,
+          score,
+          totalQuestions: quizData.length,
+          userAnswers,
+          quizData
+        });
+      }
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      userAnswers = [];
+      shuffledOptions = [];
+      document.getElementById('quiz-container').style.display = 'block';
+      document.getElementById('result-container').innerHTML = '';
+      if (window.quizIntegration) {
+        window.quizIntegration.resetResultMessage();
+      } else {
+        document.getElementById('attendance-link').style.display = 'none';
+      }
+      loadQuestion();
+    }
+
+    function goToTopPage() {
+      window.location.href = 'index.html';
+    }
+
+    loadQuestion();
+  </script>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="quiz-auth-config.js"></script>
+  <script src="quiz-integration.js"></script>
+</body>
+</html>
