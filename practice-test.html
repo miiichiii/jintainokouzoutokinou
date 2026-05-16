@@ -1,0 +1,2406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+  <title>総合練習テスト（人体の構造と機能）</title>
+  <style>
+    :root { color-scheme: light; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans JP', 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(160deg, #f0f9ff 0%, #eef2ff 45%, #fff7ed 100%);
+      color: #1e293b;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.94);
+      border-radius: 24px;
+      box-shadow: 0 24px 70px rgba(15,23,42,0.16);
+      padding: 24px;
+    }
+    h1 { text-align: center; color: #1e3a8a; font-size: clamp(1.5rem, 5vw, 2.3rem); margin-bottom: 8px; }
+    .lead { text-align: center; color: #475569; line-height: 1.7; margin: 0 auto 22px; max-width: 760px; }
+    .quiz-meta { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; }
+    .pill { background: #dbeafe; color: #1d4ed8; border-radius: 999px; padding: 8px 13px; font-weight: 700; font-size: 0.9rem; }
+    .progress { color: #475569; font-weight: 700; margin-bottom: 10px; }
+    .question {
+      font-size: 1.25em;
+      font-weight: 700;
+      margin: 18px 0;
+      line-height: 1.7;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .options { display: grid; gap: 12px; }
+    .option {
+      padding: 16px;
+      border-radius: 14px;
+      background-color: #e0f2fe;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+      border: 2px solid transparent;
+      line-height: 1.6;
+    }
+    .option:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(14,165,233,0.18); }
+    .option.correct { background-color: #bbf7d0; border-color: #22c55e; }
+    .option.incorrect { background-color: #fecaca; border-color: #ef4444; }
+    .option.selected { font-weight: 700; }
+    .option.disabled { pointer-events: none; }
+    .explanation {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      margin-top: 18px;
+      padding: 16px;
+      border-left: 5px solid #3b82f6;
+      background: #eff6ff;
+      border-radius: 12px;
+      line-height: 1.7;
+    }
+    .nav-button {
+      display: block;
+      width: 100%;
+      margin-top: 22px;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      color: white;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      font-size: 1.05em;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .nav-button.secondary { background: linear-gradient(135deg, #64748b, #94a3b8); }
+    .result-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 16px;
+      margin: 14px 0;
+      line-height: 1.65;
+    }
+    .result-status.correct { color: #16a34a; font-weight: 700; }
+    .result-status.incorrect { color: #dc2626; font-weight: 700; }
+    .source { color: #64748b; font-size: 0.92em; font-weight: 700; margin-bottom: 8px; }
+    .summary { background: #ecfeff; border: 1px solid #67e8f9; border-radius: 18px; padding: 18px; margin: 18px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>総合練習テスト（人体の構造と機能）</h1>
+    <p class="lead">第1〜9回の確認テスト全体から、毎回ランダムに60問を出題します。練習用ページのため、この結果は記録用の確認テスト成績には保存されません。</p>
+    <div class="quiz-meta">
+      <span class="pill">対象: 第1〜9回</span>
+      <span class="pill">出題: 60問ランダム</span>
+      <span class="pill">全問題数: 155問</span>
+    </div>
+    <div id="quiz-container" class="quiz-container">
+      <div class="progress" id="progress"></div>
+      <div id="question" class="question"></div>
+      <div id="options" class="options"></div>
+      <div id="explanation" class="explanation"></div>
+      <button id="next" class="nav-button" onclick="nextQuestion()">次の問題</button>
+    </div>
+    <div id="result-container"></div>
+  </div>
+
+  <script>
+    const allQuizData = [
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 1,
+            "question": "解剖学で基準となる、気をつけの姿勢で立ち、手のひらを前に向けた体位を何と呼びますか？",
+            "options": [
+                  "生理学的立位",
+                  "解剖学的正位",
+                  "機能的肢位",
+                  "日常的立位"
+            ],
+            "answer": 1,
+            "explanation": "人体を記載・説明する際の基準となる姿勢は「解剖学的正位」です。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 2,
+            "question": "人体を左右に分ける面（身体の正中を通る面を含む）を何と呼びますか？",
+            "options": [
+                  "水平面",
+                  "前額面（冠状面）",
+                  "矢状面",
+                  "斜断面"
+            ],
+            "answer": 2,
+            "explanation": "人体を左右に分ける面は「矢状面」です。特に正中を通る面は「正中面」とも呼ばれます。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 3,
+            "question": "人体を構成するレベルで、同じような形態と機能を持つ細胞が集まってできるものを何と呼びますか？",
+            "options": [
+                  "器官",
+                  "個体",
+                  "細胞",
+                  "組織"
+            ],
+            "answer": 3,
+            "explanation": "細胞が集まって「組織」を形成します。組織が集まって器官、器官が集まって器官系、そして個体が構成されます。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 4,
+            "question": "体の表面や、消化管・気管などの管の内側をおおっている、細胞が密に集まった組織は何ですか？",
+            "options": [
+                  "筋組織",
+                  "結合組織",
+                  "上皮組織",
+                  "神経組織"
+            ],
+            "answer": 2,
+            "explanation": "体の表面や体内の管の内面を覆い、保護・吸収・分泌などの役割を担うのは「上皮組織」です。細胞が密に配列しているのが特徴です。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 5,
+            "question": "上皮組織において、体表や管腔に面している側の表面を何と呼びますか？",
+            "options": [
+                  "基底面",
+                  "側面",
+                  "自由面",
+                  "接着面"
+            ],
+            "answer": 2,
+            "explanation": "上皮細胞の、体外や体内の空間（管腔）に面している側を「自由面」と呼びます。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 6,
+            "question": "骨格系は大きく体幹骨格と体肢骨格に分類されます。体幹骨格に含まれないのはどれですか？",
+            "options": [
+                  "脊柱",
+                  "胸郭",
+                  "頭蓋骨",
+                  "上腕骨"
+            ],
+            "answer": 3,
+            "explanation": "体幹骨格は頭蓋骨、脊柱、胸郭から構成されます。上腕骨は上肢の骨であり、体肢骨格に含まれます。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 7,
+            "question": "脳を保護する役割を持つ頭蓋骨は、脳頭蓋を構成する骨とされます。脳頭蓋に含まれないのはどれですか？",
+            "options": [
+                  "前頭骨",
+                  "側頭骨",
+                  "下顎骨",
+                  "後頭骨"
+            ],
+            "answer": 2,
+            "explanation": "脳頭蓋は前頭骨、頭頂骨、側頭骨、後頭骨、蝶形骨、篩骨から構成されます。下顎骨は顔面頭蓋を構成する骨の一つです。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 8,
+            "question": "脊柱を構成する椎骨のうち、肋骨と関節する関節面を持つのはどの椎骨ですか？",
+            "options": [
+                  "頸椎",
+                  "胸椎",
+                  "腰椎",
+                  "仙椎"
+            ],
+            "answer": 1,
+            "explanation": "胸椎は、肋骨と関節するための関節面（肋骨窩）を持っています。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 9,
+            "question": "男性の骨盤の特徴として記述されているものではないのはどれですか？",
+            "options": [
+                  "骨盤口がハート型で狭い",
+                  "恥骨下角が狭い（\u003c70°）",
+                  "骨が全体的に厚くて重い",
+                  "骨盤口が広くて円形に近い"
+            ],
+            "answer": 3,
+            "explanation": "男性の骨盤は、女性と比較して骨盤口が狭くハート型、恥骨下角が狭く、骨が厚くて重いという特徴があります。「骨盤口が広くて円形に近い」のは女性の骨盤の特徴です。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 10,
+            "question": "大腿骨の関節に関する記述で正しいものはどれですか？",
+            "options": [
+                  "近位端は脛骨と関節する",
+                  "遠位端は腓骨とのみ関節する",
+                  "近位端は寛骨と関節する",
+                  "遠位端は足根骨と関節する"
+            ],
+            "answer": 2,
+            "explanation": "大腿骨の近位端（大腿骨頭）は寛骨の寛骨臼と関節し、股関節を形成します。遠位端は脛骨および膝蓋骨と関節し、膝関節を形成します。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 11,
+            "question": "足のアーチの主な機能として説明されているもので、最も適切なものはどれですか？",
+            "options": [
+                  "足の骨の成長を促進する",
+                  "足の見た目を美しく保つ",
+                  "体重を支え、足の骨と軟部組織に分散させる",
+                  "地面からの衝撃を直接骨に伝える"
+            ],
+            "answer": 2,
+            "explanation": "足のアーチ（土踏まず）は、体重を分散させ、歩行や走行時の地面からの衝撃を吸収する重要な役割を担っています。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 12,
+            "question": "骨の形成に関わる細胞として記述されているのは骨芽細胞と破骨細胞です。これらの細胞が含まれる構造はどれですか？",
+            "options": [
+                  "関節",
+                  "長管骨",
+                  "軟骨",
+                  "腱"
+            ],
+            "answer": 1,
+            "explanation": "骨芽細胞と破骨細胞は、骨のリモデリング（形成と吸収）に関わる細胞であり、骨組織、特に長管骨などの骨に見られます。"
+      },
+      {
+            "sourceNo": 1,
+            "sourceTitle": "第1回",
+            "sourceQuestionNo": 13,
+            "question": "肘関節の伸展に関わる骨格筋として主に挙げられるのはどれですか？",
+            "options": [
+                  "上腕二頭筋",
+                  "上腕筋",
+                  "上腕三頭筋",
+                  "腕橈骨筋"
+            ],
+            "answer": 2,
+            "explanation": "肘関節の伸展（腕を伸ばす動き）の主動作筋は、上腕の後面にある上腕三頭筋です。上腕二頭筋、上腕筋、腕橈骨筋は主に肘関節の屈曲に関わります。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 1,
+            "question": "心臓の主な役割として最も適切なものはどれか。",
+            "options": [
+                  "呼吸によって酸素を取り込む。",
+                  "栄養素を消化吸収する。",
+                  "血液を全身に送り出すポンプ。",
+                  "老廃物を体外に排出する。"
+            ],
+            "answer": 2,
+            "explanation": "心臓は、収縮と拡張を繰り返すことで血液を肺循環と体循環に送り出すポンプとしての役割を担っています。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 2,
+            "question": "健康な成人の安静時における心臓の１分間の拍出量として最も適切な値はどれか。",
+            "options": [
+                  "約70ml",
+                  "約500ml",
+                  "約5000ml",
+                  "約7000ml"
+            ],
+            "answer": 2,
+            "explanation": "心拍出量は1回拍出量×心拍数で計算されます。成人の安静時では、1回拍出量約70ml、心拍数約70回/分とすると、約4900ml/分となり、約5000ml（5L）が最も近いです。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 3,
+            "question": "心臓の心尖部は、体幹のどの方向を向いているか。",
+            "options": [
+                  "右上方",
+                  "後方",
+                  "左前下方",
+                  "真上"
+            ],
+            "answer": 2,
+            "explanation": "心臓は胸腔内でやや左に傾いて位置しており、心尖部（心臓の先端）は左前下方を向いています。第5肋間鎖骨中線付近で心尖拍動として触知できます。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 4,
+            "question": "肺循環において、二酸化炭素の多い血液が送られる場所はどこか。",
+            "options": [
+                  "左心房",
+                  "左心室",
+                  "肺",
+                  "全身"
+            ],
+            "answer": 2,
+            "explanation": "肺循環では、右心室から送り出された二酸化炭素の多い静脈血が肺動脈を通って肺へ送られ、ガス交換が行われます。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 5,
+            "question": "体循環において、酸素の多い血液を全身に送り出す心臓の部屋はどこか。",
+            "options": [
+                  "右心房",
+                  "右心室",
+                  "左心房",
+                  "左心室"
+            ],
+            "answer": 3,
+            "explanation": "左心室は、肺で酸素化された動脈血を受け取り、強力な収縮によって大動脈を通じて全身へ送り出します。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 6,
+            "question": "右心房に血液が流入する主要な血管として適切でないものはどれか。",
+            "options": [
+                  "上大静脈",
+                  "下大静脈",
+                  "肺静脈",
+                  "冠状静脈洞"
+            ],
+            "answer": 2,
+            "explanation": "右心房には、上半身からの静脈血を集める上大静脈、下半身からの静脈血を集める下大静脈、心臓自身の静脈血を集める冠状静脈洞が流入します。肺静脈は酸素化された血液を肺から左心房へ運びます。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 7,
+            "question": "左心室から全身へ血液が送り出される最も太い血管はどれか。",
+            "options": [
+                  "肺動脈",
+                  "肺静脈",
+                  "大動脈",
+                  "上大静脈"
+            ],
+            "answer": 2,
+            "explanation": "大動脈は左心室から始まり、全身へ動脈血を送る体循環の主幹となる最も太い血管です。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 8,
+            "question": "心臓の部屋の間や、心室と血管の間にある弁の主な役割は何か。",
+            "options": [
+                  "血液の濾過",
+                  "ガス交換",
+                  "血液の逆流防止",
+                  "栄養素の吸収"
+            ],
+            "answer": 2,
+            "explanation": "心臓の弁（僧帽弁、三尖弁、大動脈弁、肺動脈弁）は、血液が一方向に流れるようにし、逆流を防ぐ役割を持っています。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 9,
+            "question": "心臓の壁を構成する３つの層のうち、ポンプ機能を担う筋肉の層はどれか。",
+            "options": [
+                  "心外膜",
+                  "心筋層",
+                  "心内膜",
+                  "心膜"
+            ],
+            "answer": 1,
+            "explanation": "心臓壁は内側から心内膜、心筋層、心外膜の3層で構成されます。心筋層が最も厚く、心臓の収縮力を生み出す筋肉組織です。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 10,
+            "question": "心臓の内側を覆う最も内側の層で、血管の内皮と連続しているのはどれか。",
+            "options": [
+                  "心外膜",
+                  "心筋層",
+                  "心内膜",
+                  "心膜"
+            ],
+            "answer": 2,
+            "explanation": "心内膜は心臓の内腔全体（心房、心室、弁）を覆う薄い膜であり、血管の内壁を覆う内皮と連続しています。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 11,
+            "question": "心臓を包む二重の膜構造を何と呼ぶか。",
+            "options": [
+                  "心臓壁",
+                  "心膜",
+                  "胸膜",
+                  "横隔膜"
+            ],
+            "answer": 1,
+            "explanation": "心膜は心臓を包む袋状の二重構造の膜で、心臓を保護し、適切な位置に保持する役割があります。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 12,
+            "question": "血液を心臓から全身へ送り出す血管を一般的に何と呼ぶか。",
+            "options": [
+                  "静脈",
+                  "動脈",
+                  "毛細血管",
+                  "細静脈"
+            ],
+            "answer": 1,
+            "explanation": "動脈は、心臓から拍出された血液を全身の組織や器官へ運ぶ血管の総称です。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 13,
+            "question": "毛細血管での物質交換において、血液中の水分や溶質を間質液に流れ出させる主な要因は何と呼ばれるか。",
+            "options": [
+                  "毛細血管圧",
+                  "血液膠質浸透圧",
+                  "静脈圧",
+                  "組織液圧"
+            ],
+            "answer": 0,
+            "explanation": "毛細血管圧（血液静水圧）は、毛細血管内の血液の圧力であり、水分や低分子の溶質を血管壁を通して間質液へ押し出す（濾過させる）力として働きます。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 14,
+            "question": "下腿の筋肉が収縮することで静脈が圧迫され、血液が心臓方向へ押し上げられる現象を何と呼ぶか。",
+            "options": [
+                  "呼吸ポンプ作用",
+                  "骨格筋ポンプ作用（ミルキング）",
+                  "心臓の収縮力",
+                  "動静脈吻合"
+            ],
+            "answer": 1,
+            "explanation": "骨格筋ポンプ作用（ミルキングアクション）は、特に下肢の筋肉が収縮・弛緩する際に静脈を圧迫し、静脈弁と協調して血液を重力に逆らって心臓へ送り返すメカニズムです。"
+      },
+      {
+            "sourceNo": 2,
+            "sourceTitle": "第2回",
+            "sourceQuestionNo": 15,
+            "question": "肺循環の説明として最も適切なものはどれか。",
+            "options": [
+                  "全身に酸素と栄養を運ぶ血液の流れ。",
+                  "肝臓で解毒された血液が心臓に戻る流れ。",
+                  "右心室から肺へ二酸化炭素の多い血液を送り、酸素を取り込んだ血液が左心房に戻る流れ。",
+                  "腎臓で老廃物が濾過された血液が心臓に戻る流れ。"
+            ],
+            "answer": 2,
+            "explanation": "肺循環は、心臓（右心室）と肺の間の血液循環です。右心室から出た静脈血が肺動脈を通って肺へ行き、ガス交換（二酸化炭素放出、酸素取り込み）が行われ、酸素化された動脈血が肺静脈を通って左心房へ戻ります。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 1,
+            "question": "血管の役割として適切でないものはどれか。",
+            "options": [
+                  "酸素を運ぶ。",
+                  "老廃物を運ぶ。",
+                  "ホルモンを生成する。",
+                  "栄養を運ぶ。"
+            ],
+            "answer": 2,
+            "explanation": "血管は酸素、栄養、老廃物、ホルモンなど、あらゆる物質の通り道となりますが、ホルモンを生成するのは内分泌腺などであり、血管そのものの役割ではありません。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 2,
+            "question": "動脈壁を構成する組織の層について、正しい組み合わせはどれか。",
+            "options": [
+                  "内膜、中膜、筋膜",
+                  "内膜、中膜、外膜",
+                  "上皮、平滑筋、結合組織",
+                  "基底膜、内皮、外膜"
+            ],
+            "answer": 1,
+            "explanation": "動脈壁は血管内腔側から順に、内膜（内皮＋基底膜）、中膜（平滑筋層と弾性線維）、外膜（疎性結合組織）からなる 3 層構造です。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 3,
+            "question": "毛細血管の特徴として最も適切なものはどれか。",
+            "options": [
+                  "動脈と同様に3層構造を持つ。",
+                  "主に骨格筋の収縮によって血液が流れる。",
+                  "血管壁が薄く、物質交換が容易に行われる。",
+                  "血液を心臓へ戻す役割を持つ。"
+            ],
+            "answer": 2,
+            "explanation": "毛細血管は1層の内皮細胞とその周囲の基底膜で構成されており血管壁が薄く、多くの物質が容易に通過できます。ここで栄養物、酸素、二酸化炭素、老廃物が血液と組織液との間で交換されます。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 4,
+            "question": "静脈の特徴について、正しいものはどれか。",
+            "options": [
+                  "常に動脈よりも血管壁が厚い。",
+                  "血液の逆流を防ぐ弁が形成されていることがある。",
+                  "酸素の多い血液を心臓へ運ぶ。",
+                  "体循環では心臓から血液を送り出す血管である。"
+            ],
+            "answer": 1,
+            "explanation": "静脈は動脈と同様の構造を持ちますが、中膜と内膜は薄いです。また、静脈の内膜が内方におれまがり、弁が形成されていることがあります。体循環では静脈は心臓に血液が流入する血管であり 、二酸化炭素の多い血液を運びます 。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 5,
+            "question": "静脈還流（血液が体循環の静脈を通って心臓に戻ること）を助けるメカニズムはどれか。",
+            "options": [
+                  "心臓の拍動",
+                  "骨格筋ポンプ",
+                  "動脈の弾性収縮",
+                  "腎臓での水分再吸収"
+            ],
+            "answer": 1,
+            "explanation": "静脈還流は、静脈と右心房の間の血圧差や、骨格筋ポンプ、呼吸ポンプによって助けられます。心臓の拍動は動脈血を送り出す主な駆動力ですが、静脈還流を直接助けるメカニズムとしては骨格筋ポンプや呼吸ポンプが挙げられています。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 6,
+            "question": "下肢の静脈における骨格筋ポンプ作用の説明として最も適切なものはどれか。",
+            "options": [
+                  "筋収縮によって静脈が圧迫され、血液が心臓に近い方向へ押し上げられる。",
+                  "筋弛緩時に静脈弁が開き、血液が逆流するのを許容する。",
+                  "心臓に近い側の静脈弁は常に閉じている。",
+                  "骨格筋ポンプは主に動脈血の流れを促進する。"
+            ],
+            "answer": 0,
+            "explanation": "下腿の筋が収縮すると静脈を圧迫し、血液は心臓に近い弁を通過します（ミルキング作用）。心臓から遠い位置にある静脈弁は閉じて逆流を防ぎます。筋弛緩後は、収縮部位の血圧が低下し、心臓に近い側の静脈弁が閉じます。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 7,
+            "question": "体循環の説明として最も適切なものはどれか。",
+            "options": [
+                  "血液を肺に送り酸素を取り入れ、二酸化炭素を排出する循環。",
+                  "全身に血液をおくり、酸素と栄養を運び、二酸化炭素や老廃物を心臓に戻す循環。",
+                  "肝臓を通過して栄養分を吸収する循環。",
+                  "心臓自身に血液を供給する循環。"
+            ],
+            "answer": 1,
+            "explanation": "体循環は、全身に血液をおくり、酸素と栄養を運ぶとともに、全身からの二酸化炭素や老廃物を心臓に戻す循環です 。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 8,
+            "question": "右主気管支と左主気管支を比較したときの右主気管支の特徴として最も適切なものはどれか。",
+            "options": [
+                  "左主気管支よりも細く長い。",
+                  "左主気管支よりも太く短く、より垂直に近い角度で分岐する。",
+                  "左主気管支と全く同じ形状・角度である。",
+                  "気管支軟骨を欠く。"
+            ],
+            "answer": 1,
+            "explanation": "右主気管支は左主気管支よりも太く短く、気管からの分岐角度がより垂直に近いため、誤嚥した異物が入り込みやすい側とされます。臨床的にも誤嚥性肺炎は右肺に多発します。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 9,
+            "question": "体循環において、動脈と静脈を流れる血液の種類について正しい組み合わせはどれか。",
+            "options": [
+                  "動脈：酸素が多い、静脈：二酸化炭素が多い",
+                  "動脈：二酸化炭素が多い、静脈：酸素が多い",
+                  "動脈：栄養が多い、静脈：老廃物が多い",
+                  "動脈：ホルモンが多い、静脈：ホルモンが少ない"
+            ],
+            "answer": 0,
+            "explanation": "体循環では、動脈は酸素の多い血液を運び、静脈は二酸化炭素の多い血液を運びます 。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 10,
+            "question": "肺循環において、肺動脈と肺静脈を流れる血液の種類について正しい組み合わせはどれか。",
+            "options": [
+                  "肺動脈：酸素が多い、肺静脈：二酸化炭素が多い",
+                  "肺動脈：二酸化炭素が多い、肺静脈：酸素が多い",
+                  "肺動脈：栄養が多い、肺静脈：栄養が少ない",
+                  "肺動脈：老廃物が多い、肺静脈：老廃物が少ない"
+            ],
+            "answer": 1,
+            "explanation": "肺循環においては、肺動脈は二酸化炭素の多い血液を運び、肺静脈は酸素の多い血液を運びます。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 11,
+            "question": "呼吸器系の主な役割として最も適切なものはどれか。",
+            "options": [
+                  "栄養分の吸収と運搬。",
+                  "老廃物の濾過と排出。",
+                  "空気中の酸素を取り込み、体内の二酸化炭素を排出すること。",
+                  "ホルモンの生成と分泌。"
+            ],
+            "answer": 2,
+            "explanation": "呼吸器系は、空気中の酸素を取り込み、体内の二酸化炭素を排出する役割を担います。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 12,
+            "question": "気道の全体像について、空気の流れを正しい順序で示したものはどれか。",
+            "options": [
+                  "肺胞→気管支→気管",
+                  "気管→気管支→肺胞",
+                  "気管支→気管→肺胞",
+                  "肺胞→気管→気管支"
+            ],
+            "answer": 1,
+            "explanation": "吸気の流れは、鼻腔・口腔→咽頭→喉頭→気管→主気管支→細気管支→肺胞という順路をたどります。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 13,
+            "question": "呼吸器系において、血液と空気の間でガス交換（酸素と二酸化炭素の交換）が主に行われる場所はどこか。",
+            "options": [
+                  "気管",
+                  "気管支",
+                  "肺胞",
+                  "鼻腔"
+            ],
+            "answer": 2,
+            "explanation": "肺胞はガス交換が行われる場所です 。肺循環によって運ばれてきた血液が肺胞の毛細血管でガス交換を行います。"
+      },
+      {
+            "sourceNo": 3,
+            "sourceTitle": "第3回",
+            "sourceQuestionNo": 14,
+            "question": "肺胞に存在する細胞のうち、血液と空気の間で行われるガス交換のほとんどを行う細胞はどれか。",
+            "options": [
+                  "サーファクタント分泌細胞",
+                  "肺胞マクロファージ",
+                  "血管内皮細胞",
+                  "肺胞上皮細胞"
+            ],
+            "answer": 3,
+            "explanation": "肺胞上皮細胞は、血液と空気の間で酸素と二酸化炭素のガス交換のほとんどを行います 。サーファクタント分泌細胞はサーファクタントを含む肺胞液を分泌し 、肺胞マクロファージは塵埃粒子や異物を除去します 。血管内皮細胞は血管壁を構成する細胞であり、肺胞のガス交換に関わる細胞とは異なります。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 1,
+            "question": "胃体部の主な働きはどれか。",
+            "options": [
+                  "食塊を一時的に貯蔵する",
+                  "胃液と混ぜて粉砕する",
+                  "胆汁を分泌する",
+                  "ビタミンB₁₂を吸収する"
+            ],
+            "answer": 1,
+            "explanation": "胃体部では強い蠕動運動により食塊を胃液と混和し、細かく粉砕する機能が中心である。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 2,
+            "question": "食塊を一時的に貯蔵する胃の部位はどれか。",
+            "options": [
+                  "噴門部",
+                  "胃底部",
+                  "幽門部",
+                  "胃角"
+            ],
+            "answer": 1,
+            "explanation": "噴門部から胃底部にかけては伸展性が高く、食塊を短時間貯蔵する役割を担う。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 3,
+            "question": "三大唾液腺に含まれないのはどれか。",
+            "options": [
+                  "耳下腺",
+                  "顎下腺",
+                  "舌下腺",
+                  "膵臓"
+            ],
+            "answer": 3,
+            "explanation": "三大唾液腺は耳下腺・顎下腺・舌下腺であり、膵臓は唾液腺ではなく消化液（膵液）を分泌する外分泌腺である。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 4,
+            "question": "食道が横隔膜を通過するときの開口部はどれか。",
+            "options": [
+                  "大動脈裂孔",
+                  "食道裂孔",
+                  "腸骨稜",
+                  "大網孔"
+            ],
+            "answer": 1,
+            "explanation": "食道は横隔膜を貫く食道裂孔（高さT10付近）を通って胃へ続く。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 5,
+            "question": "小腸と大腸の境界に位置し、内容物の逆流を防ぐ弁はどれか。",
+            "options": [
+                  "幽門弁",
+                  "回盲弁",
+                  "大網弁",
+                  "肛門弁"
+            ],
+            "answer": 1,
+            "explanation": "回盲弁（バウヒン弁）は回腸末端と盲腸の移行部にあり、大腸内容の小腸への逆流を防止する。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 6,
+            "question": "大腸に分類されない部位はどれか。",
+            "options": [
+                  "上行結腸",
+                  "横行結腸",
+                  "盲腸",
+                  "十二指腸"
+            ],
+            "answer": 3,
+            "explanation": "十二指腸は小腸の最初の部分であり、大腸（盲腸・結腸・直腸など）には含まれない。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 7,
+            "question": "肝臓の下面に付着し、胆汁を一時的に貯蔵する袋状の臓器はどれか。",
+            "options": [
+                  "胆嚢",
+                  "胆管",
+                  "膵臓",
+                  "脾臓"
+            ],
+            "answer": 0,
+            "explanation": "胆汁は肝臓で作られた後、肝臓下面にある胆嚢に蓄えられ、食後に十二指腸へ排出される。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 8,
+            "question": "膵臓で内分泌機能を担う構造はどれか。",
+            "options": [
+                  "外分泌腺房",
+                  "ランゲルハンス島",
+                  "胆嚢腺窩",
+                  "ブルンナー腺"
+            ],
+            "answer": 1,
+            "explanation": "ランゲルハンス島（膵島）はインスリンやグルカゴンなどのホルモンを分泌する膵臓の内分泌部位である。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 9,
+            "question": "嚥下時に喉頭口を塞ぎ、食物が気道に入らないようにする構造はどれか。",
+            "options": [
+                  "口蓋垂",
+                  "口蓋扁桃",
+                  "喉頭蓋",
+                  "舌根"
+            ],
+            "answer": 2,
+            "explanation": "嚥下第2相（咽頭相）では、喉頭蓋が後下方に倒れて喉頭口を塞ぐとともに声門が閉鎖し、食塊は食道へ送られる。この機能が低下すると誤嚥性肺炎のリスクが高まる。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 10,
+            "question": "胃の区分を噴門側から幽門側へ正しい順序に並べたものはどれか。",
+            "options": [
+                  "噴門部 → 幽門部 → 胃体部 → 胃底部",
+                  "噴門部 → 胃底部 → 胃体部 → 幽門部",
+                  "胃底部 → 噴門部 → 胃体部 → 幽門部",
+                  "噴門部 → 胃体部 → 胃底部 → 幽門部"
+            ],
+            "answer": 1,
+            "explanation": "食物の流れは食道→噴門→胃底部（ドーム状の上部）→胃体部（中央部、蠕動で混和・粉砕）→角切痕→幽門部→十二指腸の順である。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 11,
+            "question": "肝門を通過する構造物の組合せとして正しいのはどれか。",
+            "options": [
+                  "下大静脈・肝静脈・総胆管",
+                  "固有肝動脈・門脈・総胆管",
+                  "上腸間膜動脈・脾静脈・膵管",
+                  "腹腔動脈・奇静脈・リンパ管"
+            ],
+            "answer": 1,
+            "explanation": "肝門では固有肝動脈（酸素の多い動脈血）、門脈（消化管からの栄養に富む静脈血）、総胆管（胆汁の排出路）の3本が出入りする。下大静脈は肝臓の後面を通り、肝静脈を介して肝の血液を受け取るが肝門は通らない。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 12,
+            "question": "総胆管と主膵管が合流し、十二指腸下行部に開口する部位はどれか。",
+            "options": [
+                  "幽門",
+                  "ファーター乳頭（大十二指腸乳頭）",
+                  "トライツ靭帯",
+                  "回盲弁"
+            ],
+            "answer": 1,
+            "explanation": "総胆管と主膵管は十二指腸下行部のファーター乳頭（大十二指腸乳頭）で合流して開口し、オッディ括約筋によって胆汁・膵液の排出が調節される。"
+      },
+      {
+            "sourceNo": 4,
+            "sourceTitle": "第4回",
+            "sourceQuestionNo": 13,
+            "question": "小腸の一部である回腸末端が流入する大腸の部位はどれか。",
+            "options": [
+                  "上行結腸",
+                  "盲腸",
+                  "S状結腸",
+                  "直腸"
+            ],
+            "answer": 1,
+            "explanation": "回腸末端は盲腸に流入し、その移行部に回盲弁（バウヒン弁）がある。盲腸からは虫垂が突出する。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 1,
+            "question": "眼球の表面を潤し、乾燥から守る働きがある液体はどれか。",
+            "options": [
+                  "血液",
+                  "唾液",
+                  "涙液",
+                  "リンパ液"
+            ],
+            "answer": 2,
+            "explanation": "涙液は眼球表面を潤し、乾燥や異物から角膜・結膜を守る。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 2,
+            "question": "光を受け取り、視覚情報を神経信号へ変換する細胞が存在する膜状組織はどれか。",
+            "options": [
+                  "角膜",
+                  "水晶体",
+                  "網膜",
+                  "強膜"
+            ],
+            "answer": 2,
+            "explanation": "網膜には視細胞が存在し、光刺激を神経信号へ変換する。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 3,
+            "question": "眼球を上下左右に動かす働きを担う筋肉群はどれか。",
+            "options": [
+                  "内眼筋",
+                  "眼輪筋",
+                  "外眼筋",
+                  "毛様体筋"
+            ],
+            "answer": 2,
+            "explanation": "外眼筋は眼球外側に付着し、眼球運動を行う筋群である。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 4,
+            "question": "眼球前部を満たし、眼圧の維持や角膜・水晶体への栄養供給に関わる液体はどれか。",
+            "options": [
+                  "硝子体液",
+                  "眼房水",
+                  "涙液",
+                  "リンパ液"
+            ],
+            "answer": 1,
+            "explanation": "眼房水は前房・後房を満たし、眼圧維持と栄養供給に関わる。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 5,
+            "question": "聴覚と平衡感覚の感覚細胞が存在するのは、耳のどの部分か。",
+            "options": [
+                  "外耳",
+                  "中耳",
+                  "内耳",
+                  "耳管"
+            ],
+            "answer": 2,
+            "explanation": "内耳には蝸牛、前庭、半規管があり、聴覚と平衡感覚の受容器を含む。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 6,
+            "question": "螺旋状の形をした内耳の聴覚器官はどれか。",
+            "options": [
+                  "前庭",
+                  "半規管",
+                  "蝸牛",
+                  "耳小骨"
+            ],
+            "answer": 2,
+            "explanation": "蝸牛は螺旋状の構造で、音の振動を感知する聴覚器官である。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 7,
+            "question": "頭部の傾きや直線加速度を感知する内耳の受容器はどれか。",
+            "options": [
+                  "蝸牛",
+                  "半規管",
+                  "平衡斑",
+                  "鼓膜"
+            ],
+            "answer": 2,
+            "explanation": "平衡斑は耳石器にあり、重力方向や直線加速度を感知する。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 8,
+            "question": "頭部の回転、つまり角加速度を感知する内耳の構造はどれか。",
+            "options": [
+                  "平衡斑",
+                  "蝸牛",
+                  "半規管",
+                  "耳管"
+            ],
+            "answer": 2,
+            "explanation": "半規管は頭部の回転運動を感知し、姿勢保持や視線安定に関わる。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 9,
+            "question": "エレベーターの昇降を感じる感覚に最も関係するのはどれか。",
+            "options": [
+                  "音を聞く感覚",
+                  "回転を感じる感覚",
+                  "直線加速度を感じる感覚",
+                  "色を識別する感覚"
+            ],
+            "answer": 2,
+            "explanation": "上下方向の動きは直線加速度であり、耳石器の平衡斑が関与する。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 10,
+            "question": "頭部が動いても視線を保つ前庭動眼反射に、主に入力を与える感覚情報はどれか。",
+            "options": [
+                  "皮膚からの触覚情報",
+                  "内耳からの平衡感覚情報",
+                  "鼻からの嗅覚情報",
+                  "味蕾からの味覚情報"
+            ],
+            "answer": 1,
+            "explanation": "内耳の前庭器官からの情報は眼球運動を調節し、視界を安定させる。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 11,
+            "question": "中耳に存在する耳小骨を、鼓膜側から内耳側へ正しい順序で並べたものはどれか。",
+            "options": [
+                  "ツチ骨 → キヌタ骨 → アブミ骨",
+                  "アブミ骨 → キヌタ骨 → ツチ骨",
+                  "キヌタ骨 → ツチ骨 → アブミ骨",
+                  "ツチ骨 → アブミ骨 → キヌタ骨"
+            ],
+            "answer": 0,
+            "explanation": "鼓膜の振動はツチ骨、キヌタ骨、アブミ骨の順に伝わり、内耳へ伝達される。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 12,
+            "question": "網膜上で視細胞が存在せず、生理的盲点となる部位はどれか。",
+            "options": [
+                  "中心窩",
+                  "黄斑部",
+                  "視神経乳頭",
+                  "毛様体"
+            ],
+            "answer": 2,
+            "explanation": "視神経乳頭では視神経線維が眼球を出るため視細胞が存在しない。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 13,
+            "question": "網膜で最も視力が高く、色覚に関わる錐体細胞が密集する部位はどれか。",
+            "options": [
+                  "視神経乳頭",
+                  "中心窩",
+                  "毛様体",
+                  "脈絡膜"
+            ],
+            "answer": 1,
+            "explanation": "中心窩は黄斑部の中央にあり、錐体細胞が密集して精細な視覚を担う。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 14,
+            "question": "眼房水を産生し、水晶体の厚み調節にも関わる構造はどれか。",
+            "options": [
+                  "角膜",
+                  "虹彩",
+                  "毛様体",
+                  "強膜"
+            ],
+            "answer": 2,
+            "explanation": "毛様体は眼房水を産生し、毛様体筋により水晶体の厚みを調節する。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 15,
+            "question": "蝸牛管内にあり、音の振動を感知する聴覚の受容器はどれか。",
+            "options": [
+                  "ラセン器（コルチ器）",
+                  "平衡斑",
+                  "膨大部稜",
+                  "耳石膜"
+            ],
+            "answer": 0,
+            "explanation": "ラセン器には有毛細胞があり、音の機械的振動を神経信号へ変換する。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 16,
+            "question": "眼球の最前部にあり、透明で光を大きく屈折させる構造はどれか。",
+            "options": [
+                  "角膜",
+                  "網膜",
+                  "強膜",
+                  "脈絡膜"
+            ],
+            "answer": 0,
+            "explanation": "角膜は眼球前面の透明な膜で、光を眼内へ入れ屈折させる。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 17,
+            "question": "遠近調節で厚みが変化し、光を網膜上に焦点化する透明な構造はどれか。",
+            "options": [
+                  "虹彩",
+                  "水晶体",
+                  "硝子体",
+                  "結膜"
+            ],
+            "answer": 1,
+            "explanation": "水晶体は厚みを変えて屈折力を調節し、網膜に焦点を合わせる。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 18,
+            "question": "瞳孔の大きさを調節し、眼に入る光の量を調整する構造はどれか。",
+            "options": [
+                  "角膜",
+                  "水晶体",
+                  "虹彩",
+                  "網膜"
+            ],
+            "answer": 2,
+            "explanation": "虹彩は瞳孔径を変化させ、眼内に入る光量を調整する。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 19,
+            "question": "外耳道の奥にあり、音波を受けて振動する膜はどれか。",
+            "options": [
+                  "前庭窓",
+                  "鼓膜",
+                  "耳管",
+                  "蝸牛管"
+            ],
+            "answer": 1,
+            "explanation": "鼓膜は外耳と中耳の境界にあり、音波を振動として耳小骨へ伝える。"
+      },
+      {
+            "sourceNo": 5,
+            "sourceTitle": "第5回",
+            "sourceQuestionNo": 20,
+            "question": "中耳と咽頭を連絡し、中耳内の圧を調整する管はどれか。",
+            "options": [
+                  "蝸牛管",
+                  "半規管",
+                  "外耳道",
+                  "耳管"
+            ],
+            "answer": 3,
+            "explanation": "耳管は中耳腔と咽頭をつなぎ、鼓膜の両側の圧を調整する。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 1,
+            "question": "中枢神経系を構成する組み合わせとして正しいものはどれか。",
+            "options": [
+                  "脳と脊髄",
+                  "脳神経と脊髄神経",
+                  "交感神経と副交感神経",
+                  "筋と腱"
+            ],
+            "answer": 0,
+            "explanation": "中枢神経系は脳と脊髄から構成される。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 2,
+            "question": "神経活動の主役となり、情報を受け取り伝える細胞はどれか。",
+            "options": [
+                  "グリア細胞",
+                  "ニューロン（神経細胞）",
+                  "赤血球",
+                  "上皮細胞"
+            ],
+            "answer": 1,
+            "explanation": "ニューロンは神経情報の受容・統合・伝達を担う。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 3,
+            "question": "ニューロンを支持し、神経組織の環境維持などを担う細胞はどれか。",
+            "options": [
+                  "骨細胞",
+                  "筋細胞",
+                  "グリア細胞",
+                  "脂肪細胞"
+            ],
+            "answer": 2,
+            "explanation": "グリア細胞はニューロンを支持し、神経組織の機能維持を助ける。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 4,
+            "question": "有髄神経で興奮が髄鞘の切れ目を飛び飛びに伝わる現象はどれか。",
+            "options": [
+                  "拡散",
+                  "跳躍伝導",
+                  "濾過",
+                  "蠕動運動"
+            ],
+            "answer": 1,
+            "explanation": "有髄神経ではランビエ絞輪を介して興奮が跳躍伝導する。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 5,
+            "question": "活動電位は、神経細胞で起こるどの現象を表すか。",
+            "options": [
+                  "興奮の発生と伝導",
+                  "細胞分裂",
+                  "骨形成",
+                  "ホルモン分泌のみ"
+            ],
+            "answer": 0,
+            "explanation": "活動電位は神経細胞膜で生じる急速な電位変化で、興奮の伝導に関わる。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 6,
+            "question": "大脳の灰白質は、主に何が集まって見える部分か。",
+            "options": [
+                  "神経線維",
+                  "神経細胞体",
+                  "骨膜",
+                  "血漿"
+            ],
+            "answer": 1,
+            "explanation": "灰白質は主に神経細胞体が多く存在する部分である。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 7,
+            "question": "大脳の白質は、主に何が集まって見える部分か。",
+            "options": [
+                  "神経線維",
+                  "神経細胞体",
+                  "上皮細胞",
+                  "軟骨"
+            ],
+            "answer": 0,
+            "explanation": "白質は主に髄鞘をもつ神経線維が集まる部分である。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 8,
+            "question": "思考、判断、随意運動、感覚統合などの高次機能に深く関わる部位はどれか。",
+            "options": [
+                  "大脳皮質",
+                  "延髄",
+                  "脊髄神経",
+                  "耳小骨"
+            ],
+            "answer": 0,
+            "explanation": "大脳皮質は高次機能、随意運動、感覚情報処理などを担う。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 9,
+            "question": "情動や記憶に深く関わる大脳の領域として適切なものはどれか。",
+            "options": [
+                  "橋",
+                  "大脳辺縁系",
+                  "小脳虫部",
+                  "脊髄前角"
+            ],
+            "answer": 1,
+            "explanation": "大脳辺縁系は情動や記憶形成に関与する。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 10,
+            "question": "脳幹に含まれる組み合わせとして正しいものはどれか。",
+            "options": [
+                  "大脳・小脳・脊髄",
+                  "視床・視床下部・小脳",
+                  "中脳・橋・延髄",
+                  "硬膜・クモ膜・軟膜"
+            ],
+            "answer": 2,
+            "explanation": "脳幹は中脳、橋、延髄から構成される。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 11,
+            "question": "呼吸や循環など生命維持に重要な中枢が存在する部位はどれか。",
+            "options": [
+                  "大脳皮質",
+                  "小脳",
+                  "視床",
+                  "延髄"
+            ],
+            "answer": 3,
+            "explanation": "延髄には呼吸・循環など生命維持に関わる中枢がある。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 12,
+            "question": "中脳と延髄の間に位置し、小脳との連絡にも関わる脳幹の部位はどれか。",
+            "options": [
+                  "中脳",
+                  "橋",
+                  "間脳",
+                  "大脳基底核"
+            ],
+            "answer": 1,
+            "explanation": "橋は中脳と延髄の間に位置し、小脳との連絡にも関わる。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 13,
+            "question": "脳と脊髄を包む髄膜の組み合わせとして正しいものはどれか。",
+            "options": [
+                  "粘膜・漿膜・滑膜",
+                  "皮質・髄質・被膜",
+                  "硬膜・クモ膜・軟膜",
+                  "骨膜・筋膜・胸膜"
+            ],
+            "answer": 2,
+            "explanation": "髄膜は外側から硬膜、クモ膜、軟膜の3層である。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 14,
+            "question": "脳脊髄液が存在する主な空間はどれか。",
+            "options": [
+                  "硬膜外腔",
+                  "クモ膜下腔",
+                  "胸膜腔",
+                  "関節腔"
+            ],
+            "answer": 1,
+            "explanation": "脳脊髄液は主にクモ膜下腔に存在し、脳と脊髄を保護する。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 15,
+            "question": "脳が液体の中に浮かぶように保護されるとき、その液体はどれか。",
+            "options": [
+                  "リンパ液",
+                  "胆汁",
+                  "脳脊髄液",
+                  "滑液"
+            ],
+            "answer": 2,
+            "explanation": "脳脊髄液は脳の浮力を保ち、衝撃から守る。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 16,
+            "question": "脳を収納し、外部からの衝撃から守る骨性構造はどれか。",
+            "options": [
+                  "頭蓋骨",
+                  "胸骨",
+                  "骨盤",
+                  "肩甲骨"
+            ],
+            "answer": 0,
+            "explanation": "脳は頭蓋骨の内部に格納され、保護されている。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 17,
+            "question": "末梢から中枢へ情報を送る神経を何と呼ぶか。",
+            "options": [
+                  "遠心性神経",
+                  "求心性神経",
+                  "運動神経のみ",
+                  "自律神経のみ"
+            ],
+            "answer": 1,
+            "explanation": "求心性神経は感覚情報などを末梢から中枢へ送る。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 18,
+            "question": "中枢から末梢へ命令を送る神経を何と呼ぶか。",
+            "options": [
+                  "求心性神経",
+                  "感覚神経のみ",
+                  "遠心性神経",
+                  "脳脊髄液"
+            ],
+            "answer": 2,
+            "explanation": "遠心性神経は中枢から筋や腺などの効果器へ情報を送る。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 19,
+            "question": "体温、摂食、飲水などの恒常性調節に深く関わる脳の部位はどれか。",
+            "options": [
+                  "視床下部",
+                  "鼓膜",
+                  "腎盂",
+                  "脾臓"
+            ],
+            "answer": 0,
+            "explanation": "視床下部は体温、摂食、飲水、内分泌調節など恒常性維持に関わる。"
+      },
+      {
+            "sourceNo": 6,
+            "sourceTitle": "第6回",
+            "sourceQuestionNo": 20,
+            "question": "神経系を構造で大きく分けると、中枢神経系と何に分けられるか。",
+            "options": [
+                  "末梢神経系",
+                  "消化器系",
+                  "循環器系",
+                  "内分泌器系のみ"
+            ],
+            "answer": 0,
+            "explanation": "神経系は構造的に中枢神経系と末梢神経系に大別される。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 1,
+            "question": "脳から直接出入りする末梢神経を何と呼ぶか。",
+            "options": [
+                  "脊髄神経",
+                  "脳神経",
+                  "交感神経幹",
+                  "皮神経"
+            ],
+            "answer": 1,
+            "explanation": "脳神経は脳から直接出入りする末梢神経である。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 2,
+            "question": "脊髄神経は全部で何対あるか。",
+            "options": [
+                  "12対",
+                  "24対",
+                  "31対",
+                  "43対"
+            ],
+            "answer": 2,
+            "explanation": "脊髄神経は頚8対、胸12対、腰5対、仙5対、尾骨1対の計31対である。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 3,
+            "question": "頚椎は7個だが、頚神経は何対あるか。",
+            "options": [
+                  "7対",
+                  "8対",
+                  "12対",
+                  "31対"
+            ],
+            "answer": 1,
+            "explanation": "頚神経は8対あり、頚椎の数7個とは異なる点に注意する。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 4,
+            "question": "末梢神経系の分類として講義で示されたものは、脳神経、脊髄神経と何か。",
+            "options": [
+                  "中枢神経系",
+                  "感覚器系",
+                  "自律神経系",
+                  "内分泌器系"
+            ],
+            "answer": 2,
+            "explanation": "末梢神経系は脳神経、脊髄神経、自律神経系として整理できる。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 5,
+            "question": "腕神経叢を構成する主な脊髄神経根はどれか。",
+            "options": [
+                  "C1〜C4",
+                  "C5〜T1",
+                  "T12〜L4",
+                  "L4〜S4"
+            ],
+            "answer": 1,
+            "explanation": "腕神経叢は主にC5〜T1からなり、上肢の神経支配に関わる。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 6,
+            "question": "腰神経叢の構成として講義で示された範囲はどれか。",
+            "options": [
+                  "T12〜L4",
+                  "C5〜T1",
+                  "L4〜S4",
+                  "S2〜S4"
+            ],
+            "answer": 0,
+            "explanation": "腰神経叢は主にT12〜L4から構成される。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 7,
+            "question": "仙骨神経叢と坐骨神経に関係が深い神経根の範囲はどれか。",
+            "options": [
+                  "C1〜C4",
+                  "T1〜T5",
+                  "L4〜S4",
+                  "S5〜尾骨神経"
+            ],
+            "answer": 2,
+            "explanation": "仙骨神経叢は主にL4〜S4からなり、坐骨神経などを出す。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 8,
+            "question": "自律神経系が主に調整する対象として最も適切なものはどれか。",
+            "options": [
+                  "骨の長さ",
+                  "皮膚の色素量",
+                  "内臓の働き",
+                  "爪の形"
+            ],
+            "answer": 2,
+            "explanation": "自律神経系は内臓、血管、腺などの働きを無意識に調整する。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 9,
+            "question": "交感神経幹は、どの神経系に属する構造か。",
+            "options": [
+                  "交感神経系",
+                  "副交感神経系",
+                  "体性感覚系",
+                  "内分泌器系"
+            ],
+            "answer": 0,
+            "explanation": "交感神経幹は交感神経系の重要な構造である。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 10,
+            "question": "顔面表情筋の運動に関わる顔面神経は第何脳神経か。",
+            "options": [
+                  "第Ⅴ脳神経",
+                  "第Ⅶ脳神経",
+                  "第Ⅸ脳神経",
+                  "第Ⅻ脳神経"
+            ],
+            "answer": 1,
+            "explanation": "顔面神経は第Ⅶ脳神経で、表情筋の運動などに関わる。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 11,
+            "question": "聴覚と平衡覚を伝える脳神経はどれか。",
+            "options": [
+                  "内耳神経（第Ⅷ脳神経）",
+                  "舌咽神経（第Ⅸ脳神経）",
+                  "動眼神経（第Ⅲ脳神経）",
+                  "迷走神経（第Ⅹ脳神経）"
+            ],
+            "answer": 0,
+            "explanation": "内耳神経は蝸牛神経と前庭神経を含み、聴覚と平衡覚を伝える。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 12,
+            "question": "胸腹部内臓への副交感神経支配に広く関わる迷走神経は第何脳神経か。",
+            "options": [
+                  "第Ⅴ脳神経",
+                  "第Ⅶ脳神経",
+                  "第Ⅹ脳神経",
+                  "第Ⅺ脳神経"
+            ],
+            "answer": 2,
+            "explanation": "迷走神経は第Ⅹ脳神経で、胸腹部内臓の副交感神経支配に関わる。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 13,
+            "question": "下垂体前葉から分泌されるホルモンとして適切なものはどれか。",
+            "options": [
+                  "成長ホルモン（GH）",
+                  "メラトニン",
+                  "アドレナリン",
+                  "アルドステロン"
+            ],
+            "answer": 0,
+            "explanation": "下垂体前葉はGH、ACTH、TSH、PRL、LH、FSHなどを分泌する。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 14,
+            "question": "下垂体後葉から分泌されるホルモンの組み合わせとして正しいものはどれか。",
+            "options": [
+                  "GHとTSH",
+                  "ADHとオキシトシン",
+                  "メラトニンとコルチゾール",
+                  "アドレナリンとノルアドレナリン"
+            ],
+            "answer": 1,
+            "explanation": "下垂体後葉からはADHとオキシトシンが放出される。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 15,
+            "question": "松果体から分泌され、睡眠や概日リズムに関わるホルモンはどれか。",
+            "options": [
+                  "インスリン",
+                  "コルチゾール",
+                  "アルドステロン",
+                  "メラトニン"
+            ],
+            "answer": 3,
+            "explanation": "松果体はメラトニンを分泌し、睡眠や概日リズムの調整に関わる。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 16,
+            "question": "脊髄神経の根のうち、運動性線維が主に通るのはどれか。",
+            "options": [
+                  "後根",
+                  "前根",
+                  "後根神経節",
+                  "交感神経幹"
+            ],
+            "answer": 1,
+            "explanation": "脊髄神経では前根が主に運動性線維、後根が主に感覚性線維を含む。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 17,
+            "question": "副腎皮質の球状層から分泌される代表的ホルモンはどれか。",
+            "options": [
+                  "アルドステロン",
+                  "コルチゾール",
+                  "アンドロゲン",
+                  "アドレナリン"
+            ],
+            "answer": 0,
+            "explanation": "副腎皮質の球状層はアルドステロンを分泌し、Na保持や血圧維持に関わる。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 18,
+            "question": "感覚神経細胞の細胞体が集まる、脊髄神経の後根に付随する構造はどれか。",
+            "options": [
+                  "交感神経節",
+                  "脊髄神経節（後根神経節）",
+                  "前角",
+                  "灰白質交連"
+            ],
+            "answer": 1,
+            "explanation": "脊髄神経節（後根神経節）には感覚神経細胞の細胞体が集まる。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 19,
+            "question": "副腎髄質から分泌される代表的なホルモンはどれか。",
+            "options": [
+                  "GHとTSH",
+                  "アルドステロンとコルチゾール",
+                  "インスリンとグルカゴン",
+                  "アドレナリンとノルアドレナリン"
+            ],
+            "answer": 3,
+            "explanation": "副腎髄質は交感神経刺激によりアドレナリンとノルアドレナリンを分泌する。"
+      },
+      {
+            "sourceNo": 7,
+            "sourceTitle": "第7回",
+            "sourceQuestionNo": 20,
+            "question": "膵臓で内分泌機能を担い、インスリンやグルカゴンを分泌する構造はどれか。",
+            "options": [
+                  "ランゲルハンス島（膵島）",
+                  "膵管",
+                  "十二指腸乳頭",
+                  "腺房細胞のみ"
+            ],
+            "answer": 0,
+            "explanation": "ランゲルハンス島は膵臓の内分泌部で、インスリンやグルカゴンを分泌する。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 1,
+            "question": "泌尿器系を構成する器官の組み合わせとして最も適切なものはどれか。",
+            "options": [
+                  "腎臓・尿管・膀胱・尿道",
+                  "心臓・動脈・静脈・毛細血管",
+                  "胃・小腸・大腸・肝臓",
+                  "精巣・卵巣・子宮・腟"
+            ],
+            "answer": 0,
+            "explanation": "泌尿器系は尿をつくる腎臓、尿を運ぶ尿管、尿をためる膀胱、体外へ出す尿道からなる。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 2,
+            "question": "腎臓が1日に作る原尿量として、講義資料で示された量に最も近いものはどれか。",
+            "options": [
+                  "約1.5 L",
+                  "150 L以上",
+                  "約500 mL",
+                  "約5 L"
+            ],
+            "answer": 1,
+            "explanation": "資料では腎臓が1日に150 L以上の原尿をつくることが示されている。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 3,
+            "question": "腎臓で作られた原尿の大部分はどうなるか。",
+            "options": [
+                  "すべて尿として排出される",
+                  "胆汁に変えられる",
+                  "再吸収され血液側へ戻る",
+                  "肺から排出される"
+            ],
+            "answer": 2,
+            "explanation": "原尿の大部分は尿細管で再吸収され、必要な水や物質が血液側へ戻される。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 4,
+            "question": "腎機能が失われたときに生命を脅かす異常として資料に示されていたものはどれか。",
+            "options": [
+                  "高カリウム血症",
+                  "低酸素血症のみ",
+                  "骨折",
+                  "近視"
+            ],
+            "answer": 0,
+            "explanation": "資料では高カリウム血症による心停止など、腎機能喪失の危険性が示されている。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 5,
+            "question": "腎臓の基本的な機能単位はどれか。",
+            "options": [
+                  "肝小葉",
+                  "肺胞",
+                  "ネフロン（腎単位）",
+                  "筋線維"
+            ],
+            "answer": 2,
+            "explanation": "ネフロンは腎小体と尿細管からなる腎臓の基本的な機能単位である。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 6,
+            "question": "腎小体を構成する組み合わせとして正しいものはどれか。",
+            "options": [
+                  "糸球体とボーマン嚢",
+                  "尿管と膀胱",
+                  "腎盂と尿道",
+                  "腎静脈と副腎"
+            ],
+            "answer": 0,
+            "explanation": "腎小体は毛細血管の塊である糸球体と、それを包むボーマン嚢からなる。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 7,
+            "question": "血液の濾過が主に行われる構造はどれか。",
+            "options": [
+                  "尿道",
+                  "膀胱三角",
+                  "糸球体",
+                  "尿管"
+            ],
+            "answer": 2,
+            "explanation": "糸球体では血液が濾過され、原尿が作られる。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 8,
+            "question": "糸球体濾過装置でフィルター形成に関わる細胞として資料に示されたものはどれか。",
+            "options": [
+                  "骨芽細胞",
+                  "足細胞",
+                  "赤血球",
+                  "神経細胞"
+            ],
+            "answer": 1,
+            "explanation": "足細胞の足突起が濾過障壁の一部となり、血液の濾過に関わる。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 9,
+            "question": "腎臓の皮質に多く存在し、血液の濾過に関わる構造はどれか。",
+            "options": [
+                  "腎小体",
+                  "膀胱",
+                  "尿道括約筋",
+                  "精管"
+            ],
+            "answer": 0,
+            "explanation": "腎小体は主に腎皮質に存在し、血液濾過に関わる。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 10,
+            "question": "腎臓内部で尿を集め、尿管へ向かわせる漏斗状の部位はどれか。",
+            "options": [
+                  "腎皮質",
+                  "腎錐体",
+                  "腎盂",
+                  "糸球体"
+            ],
+            "answer": 2,
+            "explanation": "腎盂は腎臓内で尿を集め、尿管へ送る部位である。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 11,
+            "question": "腎臓から膀胱へ尿を運ぶ管はどれか。",
+            "options": [
+                  "尿管",
+                  "尿道",
+                  "卵管",
+                  "精管"
+            ],
+            "answer": 0,
+            "explanation": "尿管は腎臓で作られた尿を膀胱へ運ぶ。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 12,
+            "question": "尿を一時的にためる器官はどれか。",
+            "options": [
+                  "腎臓",
+                  "膀胱",
+                  "尿管",
+                  "副腎"
+            ],
+            "answer": 1,
+            "explanation": "膀胱は尿を一時的に貯留する器官である。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 13,
+            "question": "膀胱から体外へ尿を排出する管はどれか。",
+            "options": [
+                  "尿管",
+                  "卵管",
+                  "尿道",
+                  "総胆管"
+            ],
+            "answer": 2,
+            "explanation": "尿道は膀胱から体外へ尿を導く管である。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 14,
+            "question": "腎臓で必要な物質を血液側へ戻す過程を何というか。",
+            "options": [
+                  "分娩",
+                  "再吸収",
+                  "換気",
+                  "受精"
+            ],
+            "answer": 1,
+            "explanation": "再吸収により、水や電解質など必要な物質が尿細管から血液側へ戻る。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 15,
+            "question": "尿が体外へ出るまでの流れとして正しいものはどれか。",
+            "options": [
+                  "膀胱 → 腎臓 → 尿管 → 尿道",
+                  "尿道 → 尿管 → 膀胱 → 腎臓",
+                  "腎臓 → 尿道 → 膀胱 → 尿管",
+                  "腎臓 → 尿管 → 膀胱 → 尿道"
+            ],
+            "answer": 3,
+            "explanation": "尿は腎臓で作られ、尿管、膀胱、尿道の順に流れる。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 16,
+            "question": "腎臓の働きとして最も適切なものはどれか。",
+            "options": [
+                  "酸素を取り込む",
+                  "食物を胃へ送る",
+                  "水・電解質・老廃物の調整を行う",
+                  "音を感知する"
+            ],
+            "answer": 2,
+            "explanation": "腎臓は水分、電解質、老廃物の調整を通して体内環境の維持に関わる。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 17,
+            "question": "腎錐体が主に位置する腎臓の領域はどれか。",
+            "options": [
+                  "腎髄質",
+                  "腎皮質",
+                  "膀胱粘膜",
+                  "尿道海綿体"
+            ],
+            "answer": 0,
+            "explanation": "腎錐体は腎髄質を構成する円錐状の構造である。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 18,
+            "question": "尿細管と密接に関係し、再吸収された物質を受け取る血管はどれか。",
+            "options": [
+                  "冠動脈",
+                  "尿細管周囲毛細血管",
+                  "肺静脈",
+                  "門脈"
+            ],
+            "answer": 1,
+            "explanation": "尿細管周囲毛細血管は、尿細管から再吸収された水や物質を受け取る。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 19,
+            "question": "腎臓の構造説明として最も適切なものはどれか。",
+            "options": [
+                  "腎皮質の腎小体・糸球体で濾過が始まる",
+                  "膀胱の中で原尿が作られる",
+                  "尿道は腎臓内部の構造である",
+                  "腎小体は肺胞の一部である"
+            ],
+            "answer": 0,
+            "explanation": "腎皮質にある腎小体の糸球体で血液が濾過され、尿生成が始まる。"
+      },
+      {
+            "sourceNo": 8,
+            "sourceTitle": "第8回",
+            "sourceQuestionNo": 20,
+            "question": "腎臓の説明として誤っているものはどれか。",
+            "options": [
+                  "血液から尿を作る",
+                  "原尿の多くを再吸収する",
+                  "ネフロンを機能単位とする",
+                  "尿を胆嚢へ送る"
+            ],
+            "answer": 3,
+            "explanation": "尿は腎臓から尿管、膀胱、尿道へ流れる。胆嚢へ送られるわけではない。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 1,
+            "question": "有性生殖の説明として最も適切なものはどれか。",
+            "options": [
+                  "体細胞が単独で分裂する生殖",
+                  "精子と卵が関わり受精卵をつくる生殖",
+                  "尿を作る仕組み",
+                  "血液を濾過する仕組み"
+            ],
+            "answer": 1,
+            "explanation": "有性生殖では精子と卵が関わり、受精によって受精卵が形成される。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 2,
+            "question": "骨盤腔内に位置する臓器の組み合わせとして最も適切なものはどれか。",
+            "options": [
+                  "肺・心臓・気管",
+                  "胃・肝臓・脾臓",
+                  "膀胱・直腸・生殖器",
+                  "腎臓・副腎・横隔膜"
+            ],
+            "answer": 2,
+            "explanation": "骨盤腔には膀胱、直腸、生殖器などが位置する。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 3,
+            "question": "女性生殖器の組み合わせとして適切なものはどれか。",
+            "options": [
+                  "卵巣・卵管・子宮・腟",
+                  "精巣・精管・前立腺・陰茎",
+                  "腎臓・尿管・膀胱・尿道",
+                  "心房・心室・動脈・静脈"
+            ],
+            "answer": 0,
+            "explanation": "女性生殖器には卵巣、卵管、子宮、腟などが含まれる。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 4,
+            "question": "卵巣の主な働きとして正しいものはどれか。",
+            "options": [
+                  "尿をためる",
+                  "精子を成熟させる",
+                  "卵子と女性ホルモンを産生する",
+                  "胆汁を分泌する"
+            ],
+            "answer": 2,
+            "explanation": "卵巣は卵子を形成し、エストロゲンなどの女性ホルモンを分泌する。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 5,
+            "question": "卵巣と子宮をつなぎ、受精が起こる部位として重要な管はどれか。",
+            "options": [
+                  "尿管",
+                  "卵管",
+                  "精管",
+                  "尿道"
+            ],
+            "answer": 1,
+            "explanation": "卵管は卵巣から子宮へ卵を運び、受精の場となることが多い。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 6,
+            "question": "受精卵が着床し、胎児が発育する器官はどれか。",
+            "options": [
+                  "卵巣",
+                  "膀胱",
+                  "腟",
+                  "子宮"
+            ],
+            "answer": 3,
+            "explanation": "子宮は受精卵が着床し、妊娠中に胎児が発育する器官である。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 7,
+            "question": "子宮と外陰部を連絡する管状の器官はどれか。",
+            "options": [
+                  "腟",
+                  "尿管",
+                  "精管",
+                  "卵巣"
+            ],
+            "answer": 0,
+            "explanation": "腟は子宮頚部から外陰部へ続く管状の器官である。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 8,
+            "question": "子宮を支持し、子宮・卵管・卵巣の位置関係に関わる膜状構造はどれか。",
+            "options": [
+                  "横隔膜",
+                  "腎筋膜",
+                  "子宮広間膜",
+                  "胸膜"
+            ],
+            "answer": 2,
+            "explanation": "子宮広間膜は骨盤内で子宮や付属器の位置関係に関わる膜状構造である。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 9,
+            "question": "男性生殖器の組み合わせとして適切なものはどれか。",
+            "options": [
+                  "卵巣・卵管・子宮・腟",
+                  "精巣・精巣上体・精管・前立腺",
+                  "腎臓・尿管・膀胱・尿道",
+                  "蝸牛・前庭・半規管・鼓膜"
+            ],
+            "answer": 1,
+            "explanation": "男性生殖器には精巣、精巣上体、精管、前立腺などが含まれる。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 10,
+            "question": "精巣の主な働きとして正しいものはどれか。",
+            "options": [
+                  "精子とテストステロンを産生する",
+                  "卵子を産生する",
+                  "尿をためる",
+                  "胆汁を作る"
+            ],
+            "answer": 0,
+            "explanation": "精巣は精子を作り、男性ホルモンであるテストステロンを分泌する。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 11,
+            "question": "精巣内で精子が作られる主な部位はどれか。",
+            "options": [
+                  "腎小体",
+                  "卵管采",
+                  "精細管",
+                  "膀胱三角"
+            ],
+            "answer": 2,
+            "explanation": "精細管では精子形成が行われる。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 12,
+            "question": "精子の成熟や貯蔵に関わり、精巣に接して位置する構造はどれか。",
+            "options": [
+                  "前立腺",
+                  "精巣上体",
+                  "卵巣",
+                  "子宮"
+            ],
+            "answer": 1,
+            "explanation": "精巣上体は精子の成熟や一時的な貯蔵に関わる。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 13,
+            "question": "精巣上体から精子を運ぶ管はどれか。",
+            "options": [
+                  "卵管",
+                  "尿管",
+                  "総胆管",
+                  "精管"
+            ],
+            "answer": 3,
+            "explanation": "精管は精巣上体から精子を運ぶ管である。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 14,
+            "question": "膀胱の下に位置し、男性尿道を取り囲む腺はどれか。",
+            "options": [
+                  "前立腺",
+                  "副腎",
+                  "甲状腺",
+                  "上皮小体"
+            ],
+            "answer": 0,
+            "explanation": "前立腺は膀胱の下に位置し、男性尿道を取り囲む。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 15,
+            "question": "精液の液体成分の形成に関わる男性副生殖腺として適切なものはどれか。",
+            "options": [
+                  "涙腺",
+                  "耳下腺",
+                  "精嚢",
+                  "松果体"
+            ],
+            "answer": 2,
+            "explanation": "精嚢は精液の液体成分の形成に関わる男性副生殖腺である。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 16,
+            "question": "陰茎の勃起に関わる海綿体として適切なものはどれか。",
+            "options": [
+                  "腎錐体",
+                  "陰茎海綿体",
+                  "腎小体",
+                  "平衡斑"
+            ],
+            "answer": 1,
+            "explanation": "陰茎海綿体は血液を含んで膨張し、勃起に関わる。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 17,
+            "question": "精巣を収め、温度調節にも関わる外部構造はどれか。",
+            "options": [
+                  "陰嚢",
+                  "子宮",
+                  "卵管",
+                  "膀胱"
+            ],
+            "answer": 0,
+            "explanation": "陰嚢は精巣を収め、精子形成に適した温度環境を保つことに関わる。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 18,
+            "question": "胎児期に精巣が腹部から陰嚢へ移動する現象はどれか。",
+            "options": [
+                  "排卵",
+                  "濾過",
+                  "精巣下降",
+                  "再吸収"
+            ],
+            "answer": 2,
+            "explanation": "精巣下降は精巣が腹部から陰嚢へ移動する発生過程である。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 19,
+            "question": "女性と男性の骨盤内臓器の配置について一般に正しいものはどれか。",
+            "options": [
+                  "直腸は最も前方にある",
+                  "膀胱は直腸より後方にある",
+                  "生殖器は常に骨盤腔外にある",
+                  "膀胱は前方、直腸は後方に位置する"
+            ],
+            "answer": 3,
+            "explanation": "正中矢状断では、膀胱が前方、直腸が後方に位置し、その間に生殖器が配置される。"
+      },
+      {
+            "sourceNo": 9,
+            "sourceTitle": "第9回",
+            "sourceQuestionNo": 20,
+            "question": "女性骨盤の正中矢状断で、子宮は一般にどの臓器の間に位置するか。",
+            "options": [
+                  "膀胱と直腸の間",
+                  "肺と心臓の間",
+                  "腎臓と副腎の間",
+                  "胃と肝臓の間"
+            ],
+            "answer": 0,
+            "explanation": "女性骨盤では、子宮は前方の膀胱と後方の直腸の間に位置する。"
+      }
+];
+    const PRACTICE_QUESTION_COUNT = 60;
+    let quizData = [];
+    let currentQuestion = 0;
+    let score = 0;
+    let userAnswers = [];
+    let shuffledOptions = [];
+
+    function shuffleArray(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildPracticeSet() {
+      quizData = shuffleArray(allQuizData).slice(0, Math.min(PRACTICE_QUESTION_COUNT, allQuizData.length));
+    }
+
+    function loadQuestion() {
+      const question = quizData[currentQuestion];
+      document.getElementById('progress').textContent = `問題 ${currentQuestion + 1} / ${quizData.length}`;
+      document.getElementById('question').textContent = question.question;
+      shuffledOptions = shuffleArray(question.options.map((text, originalIndex) => ({ text, originalIndex })));
+      document.getElementById('options').innerHTML = shuffledOptions.map((option, index) => `
+        <div class="option" onclick="selectOption(${index})">${option.text}</div>
+      `).join('');
+      const explanationEl = document.getElementById('explanation');
+      explanationEl.style.opacity = '0';
+      explanationEl.style.display = 'none';
+      explanationEl.innerHTML = '';
+      document.getElementById('next').textContent = currentQuestion < quizData.length - 1 ? '次の問題' : '結果を見る';
+    }
+
+    function selectOption(index) {
+      const options = document.querySelectorAll('.option');
+      if (options[index].classList.contains('disabled')) return;
+      options.forEach(option => option.classList.add('disabled'));
+      options[index].classList.add('selected');
+
+      const question = quizData[currentQuestion];
+      const selectedAnswer = shuffledOptions[index].originalIndex;
+      userAnswers[currentQuestion] = selectedAnswer;
+      options.forEach((option, i) => {
+        const originalIndex = shuffledOptions[i].originalIndex;
+        if (originalIndex === question.answer) option.classList.add('correct');
+        else if (i === index) option.classList.add('incorrect');
+      });
+
+      const explanationEl = document.getElementById('explanation');
+      explanationEl.innerHTML = `<div class="source">出典: ${question.sourceTitle} 確認テスト</div>${question.explanation}`;
+      explanationEl.style.display = 'block';
+      setTimeout(() => { explanationEl.style.opacity = '1'; }, 100);
+    }
+
+    function nextQuestion() {
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      score = userAnswers.reduce((total, answer, index) => total + (answer === quizData[index].answer ? 1 : 0), 0);
+      const resultContainer = document.getElementById('result-container');
+      document.getElementById('quiz-container').style.display = 'none';
+      const percentage = (score / quizData.length) * 100;
+      let resultHtml = `
+        <div class="summary">
+          <h2>練習結果</h2>
+          <p>正解数: <strong>${score} / ${quizData.length}</strong></p>
+          <p>正答率: <strong>${percentage.toFixed(1)}%</strong></p>
+          <p>このページは練習用です。結果は保存されません。間違えた問題の解説を確認してから、もう一度挑戦できます。</p>
+        </div>
+      `;
+
+      quizData.forEach((question, index) => {
+        const isCorrect = userAnswers[index] === question.answer;
+        const selectedText = Number.isInteger(userAnswers[index]) ? question.options[userAnswers[index]] : '未回答';
+        resultHtml += `
+          <div class="result-card">
+            <div class="source">問題 ${index + 1} / 出典: ${question.sourceTitle} 確認テスト</div>
+            <p class="result-status ${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? '正解' : '不正解'}</p>
+            <p><strong>質問:</strong> ${question.question}</p>
+            <p><strong>あなたの回答:</strong> ${selectedText}</p>
+            <p><strong>正解:</strong> ${question.options[question.answer]}</p>
+            <p><strong>説明:</strong> ${question.explanation}</p>
+          </div>
+        `;
+      });
+
+      resultHtml += '<button class="nav-button" onclick="restartQuiz()">別の60問でもう一度挑戦する</button>';
+      resultHtml += '<button class="nav-button secondary" onclick="goToTopPage()">トップページに戻る</button>';
+      resultContainer.innerHTML = resultHtml;
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      userAnswers = [];
+      shuffledOptions = [];
+      buildPracticeSet();
+      document.getElementById('quiz-container').style.display = 'block';
+      document.getElementById('result-container').innerHTML = '';
+      loadQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToTopPage() {
+      window.location.href = 'index.html';
+    }
+
+    buildPracticeSet();
+    loadQuestion();
+  </script>
+</body>
+</html>
