@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>第6回確認テスト（人体の構造と機能）</title>
@@ -180,6 +180,22 @@
       text-decoration: underline;
     }
   </style>
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem("jintainokouzoutokinou.quizTheme");
+        if (theme) {
+          document.documentElement.setAttribute("data-quiz-theme", theme);
+        }
+        var scale = localStorage.getItem("jintainokouzoutokinou.quizFontScale");
+        if (scale) {
+          document.documentElement.style.setProperty("--q-font-scale", scale);
+        }
+      } catch (error) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="quiz-base.css?v=20260728-theme">
+  <link rel="stylesheet" href="quiz-themes.css?v=20260728-theme">
 </head>
 <body>
   <div class="container">
@@ -550,7 +566,7 @@
       });
 
       resultHtml += `<button class="nav-button" onclick="restartQuiz()">もう一度挑戦する</button>`;
-      resultHtml += `<button class="nav-button" onclick="goToTopPage()" style="margin-top: 12px; background: linear-gradient(135deg, #64748b, #94a3b8);">トップページに戻る</button>`;
+      resultHtml += `<button class="nav-button" onclick="goToTopPage()">トップページに戻る</button>`;
       resultContainer.innerHTML = resultHtml;
 
       if (window.quizIntegration) {
@@ -589,5 +605,7 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script src="quiz-auth-config.js"></script>
   <script src="quiz-integration.js"></script>
+  <script src="quiz-glass.js?v=20260728-theme"></script>
+  <script src="quiz-theme-switcher.js?v=20260728-theme"></script>
 </body>
 </html>

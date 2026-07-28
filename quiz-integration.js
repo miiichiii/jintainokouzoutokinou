@@ -45,6 +45,18 @@
     return Boolean(config.liffId && !/YOUR_|CHANGE_ME/i.test(config.liffId));
   }
 
+  function isLocalPreview() {
+    const host = window.location.hostname;
+    return (
+      window.location.protocol === "file:" ||
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "0.0.0.0" ||
+      host.endsWith(".local") ||
+      host.endsWith(".ts.net")
+    );
+  }
+
   function decorateCard(element, tone) {
     if (!element) {
       return;
@@ -152,6 +164,11 @@
     }
 
     state.initPromise = (async () => {
+      if (isLocalPreview()) {
+        setStatus("プレビュー表示中のため、LINEログインと結果保存はスキップしています。", "info");
+        return state;
+      }
+
       if (!window.liff) {
         setStatus("LINE SDK を読み込めませんでした。", "error");
         return state;
@@ -163,7 +180,10 @@
       }
 
       try {
-        await window.liff.init({ liffId: config.liffId });
+        await window.liff.init({
+          liffId: config.liffId,
+          withLoginOnExternalBrowser: true,
+        });
         if (restoreLiffStateIfNeeded()) {
           return state;
         }
@@ -213,6 +233,9 @@
 
     await initLiff();
     if (!state.ready) {
+      if (isLocalPreview()) {
+        setResult("プレビュー表示中のため、この結果は保存されません。", "info");
+      }
       if (!isLiffConfigured()) {
         setResult("LIFF ID が未設定のため、結果保存はまだ有効化されていません。", "warning");
       }
@@ -233,6 +256,15 @@
 
     setResult("結果を保存しています...", "info");
 
+    const theme =
+      (window.quizTheme && window.quizTheme.get && window.quizTheme.get()) ||
+      document.documentElement.getAttribute("data-quiz-theme") ||
+      "standard";
+    const fontScale =
+      (window.quizTheme && window.quizTheme.getScale && window.quizTheme.getScale()) ||
+      document.documentElement.style.getPropertyValue("--q-font-scale").trim() ||
+      "1";
+
     try {
       const response = await fetch(`${apiBaseUrl}/quiz_api/submit`, {
         method: "POST",
@@ -246,6 +278,8 @@
           quiz_title: result.quizTitle || document.title,
           score: result.score,
           total_questions: result.totalQuestions,
+          theme,
+          font_scale: fontScale,
           answers: buildAnswerPayload(result.quizData, result.userAnswers),
         }),
       });
