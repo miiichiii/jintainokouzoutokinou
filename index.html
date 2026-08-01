@@ -333,6 +333,124 @@
       line-height: 1.8;
     }
 
+    .homework-status {
+      margin-top: 16px;
+      padding: 18px;
+      border: 1px solid rgba(44, 123, 229, 0.16);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(236, 246, 255, 0.9), rgba(255, 255, 255, 0.74));
+      box-shadow: 0 12px 26px rgba(84, 101, 140, 0.08);
+    }
+
+    .homework-status.is-complete {
+      border-color: rgba(42, 145, 107, 0.22);
+      background: linear-gradient(135deg, rgba(229, 249, 240, 0.94), rgba(255, 255, 255, 0.76));
+    }
+
+    .homework-status.is-missing {
+      border-color: rgba(209, 135, 41, 0.24);
+      background: linear-gradient(135deg, rgba(255, 246, 222, 0.96), rgba(255, 255, 255, 0.76));
+    }
+
+    .homework-status.is-unavailable {
+      border-color: rgba(103, 117, 141, 0.18);
+      background: rgba(245, 247, 251, 0.82);
+    }
+
+    .homework-status-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .homework-status-kicker {
+      color: #49617f;
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .homework-status-title {
+      margin-top: 4px;
+      color: #173665;
+      font-size: 1.04rem;
+      font-weight: 900;
+      line-height: 1.5;
+    }
+
+    .homework-status-badge {
+      flex: 0 0 auto;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(44, 123, 229, 0.11);
+      color: #19407f;
+      font-size: 0.78rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .homework-status.is-complete .homework-status-badge {
+      background: rgba(42, 145, 107, 0.14);
+      color: #176144;
+    }
+
+    .homework-status.is-missing .homework-status-badge {
+      background: rgba(209, 135, 41, 0.15);
+      color: #7a4a0b;
+    }
+
+    .homework-status.is-unavailable .homework-status-badge {
+      background: rgba(103, 117, 141, 0.12);
+      color: #5e6879;
+    }
+
+    .homework-status-summary {
+      margin: 12px 0 0;
+      color: #324155;
+      font-size: 0.94rem;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .homework-status-breakdown {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .homework-status-row {
+      min-width: 0;
+      padding: 11px 13px;
+      border: 1px solid rgba(84, 104, 142, 0.1);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.64);
+    }
+
+    .homework-status-row span,
+    .homework-status-row strong {
+      display: block;
+    }
+
+    .homework-status-row span {
+      color: #66758d;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .homework-status-row strong {
+      margin-top: 4px;
+      color: #273b57;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .homework-status-row.is-missing strong {
+      color: #7a4a0b;
+    }
+
     .welcome-cleared {
       margin-top: 14px;
       padding: 14px 16px;
@@ -637,6 +755,23 @@
         border-radius: 20px;
       }
 
+      .homework-status {
+        padding: 16px;
+      }
+
+      .homework-status-head {
+        display: block;
+      }
+
+      .homework-status-badge {
+        display: inline-flex;
+        margin-top: 10px;
+      }
+
+      .homework-status-breakdown {
+        grid-template-columns: 1fr;
+      }
+
       .card {
         min-height: 230px;
         padding: 20px;
@@ -666,6 +801,26 @@
     <section id="welcome-panel" class="panel" style="display: none;">
       <div id="welcome-badge" class="welcome-badge" style="display: none;"></div>
       <div id="welcome-name" class="welcome-name" style="display: none;"></div>
+      <section id="homework-status" class="homework-status is-loading" style="display: none;" aria-live="polite" aria-atomic="true">
+        <div class="homework-status-head">
+          <div>
+            <div class="homework-status-kicker">宿題のお知らせ</div>
+            <div id="homework-status-title" class="homework-status-title">宿題の提出状況</div>
+          </div>
+          <div id="homework-status-badge" class="homework-status-badge">確認中</div>
+        </div>
+        <p id="homework-status-summary" class="homework-status-summary">提出状況を確認しています。</p>
+        <div id="homework-status-breakdown" class="homework-status-breakdown" style="display: none;">
+          <div class="homework-status-row">
+            <span>提出済み</span>
+            <strong id="homework-submitted-labels">—</strong>
+          </div>
+          <div class="homework-status-row is-missing">
+            <span>未提出</span>
+            <strong id="homework-missing-labels">—</strong>
+          </div>
+        </div>
+      </section>
       <div id="welcome-message" class="welcome-message" style="display: none;"></div>
       <div id="welcome-cleared-list" class="welcome-cleared" style="display: none;"></div>
       <div id="welcome-stats" class="welcome-stats" style="display: none;">
@@ -726,6 +881,13 @@
     const welcomeBadge = document.getElementById("welcome-badge");
     const welcomeName = document.getElementById("welcome-name");
     const welcomeMessage = document.getElementById("welcome-message");
+    const homeworkStatus = document.getElementById("homework-status");
+    const homeworkStatusTitle = document.getElementById("homework-status-title");
+    const homeworkStatusBadge = document.getElementById("homework-status-badge");
+    const homeworkStatusSummary = document.getElementById("homework-status-summary");
+    const homeworkStatusBreakdown = document.getElementById("homework-status-breakdown");
+    const homeworkSubmittedLabels = document.getElementById("homework-submitted-labels");
+    const homeworkMissingLabels = document.getElementById("homework-missing-labels");
     const welcomeClearedList = document.getElementById("welcome-cleared-list");
     const welcomeStats = document.getElementById("welcome-stats");
     const welcomeTotalAttempts = document.getElementById("welcome-total-attempts");
@@ -1119,13 +1281,8 @@
       }, Math.min(nextPublishTime - now + 1000, 2147483647));
     }
 
-    async function loadWelcomeProgress() {
-      if (!window.liff || !window.liff.getAccessToken || !apiBaseUrl) {
-        return;
-      }
-
-      const accessToken = window.liff.getAccessToken();
-      if (!accessToken) {
+    async function loadWelcomeProgress(accessToken) {
+      if (!accessToken || !apiBaseUrl) {
         return;
       }
 
@@ -1165,6 +1322,85 @@
       }
     }
 
+    function formatHomeworkLabels(labels, count) {
+      const normalizedLabels = Array.isArray(labels)
+        ? labels.map((label) => String(label || "").trim()).filter(Boolean)
+        : [];
+      if (normalizedLabels.length > 0) {
+        return normalizedLabels.join("・");
+      }
+      return count === 0 ? "なし" : `${count}回`;
+    }
+
+    function renderHomeworkUnavailable() {
+      homeworkStatus.classList.remove("is-loading", "is-complete", "is-missing");
+      homeworkStatus.classList.add("is-unavailable");
+      homeworkStatusTitle.textContent = "宿題の提出状況";
+      homeworkStatusBadge.textContent = "確認できません";
+      homeworkStatusSummary.textContent = "宿題の提出状況は現在確認できません。クイズはそのまま利用できます。";
+      homeworkStatusBreakdown.style.display = "none";
+    }
+
+    function renderHomeworkProgress(data) {
+      const totalCount = Number(data.total_count);
+      const submittedCount = Number(data.submitted_count);
+      const missingCount = Number(data.missing_count);
+      if (
+        !Number.isFinite(totalCount) ||
+        !Number.isFinite(submittedCount) ||
+        !Number.isFinite(missingCount) ||
+        totalCount < 0 ||
+        submittedCount < 0 ||
+        missingCount < 0
+      ) {
+        throw new Error("Invalid homework progress response");
+      }
+
+      const subjectLabel = String(data.subject_label || "宿題").trim() || "宿題";
+      const isComplete = data.is_complete === true;
+      homeworkStatus.classList.remove("is-loading", "is-complete", "is-missing", "is-unavailable");
+      homeworkStatus.classList.add(isComplete ? "is-complete" : "is-missing");
+      homeworkStatusTitle.textContent = subjectLabel;
+      homeworkStatusBadge.textContent = isComplete ? "すべて提出済み" : `未提出 ${missingCount}回`;
+      homeworkStatusSummary.textContent = `全${totalCount}回のうち${submittedCount}回を提出済みです。`;
+      homeworkSubmittedLabels.textContent = formatHomeworkLabels(data.submitted_labels, submittedCount);
+      homeworkMissingLabels.textContent = formatHomeworkLabels(data.missing_labels, missingCount);
+      homeworkStatusBreakdown.style.display = "grid";
+    }
+
+    async function loadHomeworkProgress(accessToken) {
+      if (!accessToken || !apiBaseUrl) {
+        renderHomeworkUnavailable();
+        return;
+      }
+
+      try {
+        const response = await fetch(`${apiBaseUrl}/quiz_api/homework_progress`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            line_access_token: accessToken
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        const isStale =
+          data.stale === true ||
+          data.status === "stale" ||
+          data.source_status === "stale";
+        if (!response.ok || data.ok === false || data.available === false || isStale) {
+          renderHomeworkUnavailable();
+          return;
+        }
+
+        renderHomeworkProgress(data);
+      } catch (error) {
+        console.error("Homework progress fetch failed:", error);
+        renderHomeworkUnavailable();
+      }
+    }
+
     async function initIndexLiff() {
       if (!liffId || !window.liff) {
         return;
@@ -1198,7 +1434,14 @@
             welcomePanel.style.display = "block";
             welcomeName.textContent = `${profile.displayName}さん、ようこそ`;
             welcomeName.style.display = "block";
-            await loadWelcomeProgress();
+            homeworkStatus.style.display = "block";
+            const accessToken = typeof window.liff.getAccessToken === "function"
+              ? window.liff.getAccessToken()
+              : "";
+            await Promise.allSettled([
+              loadWelcomeProgress(accessToken),
+              loadHomeworkProgress(accessToken)
+            ]);
           }
         }
       } catch (error) {
