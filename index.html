@@ -333,6 +333,30 @@
       line-height: 1.8;
     }
 
+    .confirmation-test-notice {
+      margin-top: 16px;
+      padding: 18px;
+      border: 1px solid rgba(209, 135, 41, 0.24);
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255, 246, 222, 0.96), rgba(255, 255, 255, 0.76));
+      box-shadow: 0 12px 26px rgba(84, 101, 140, 0.08);
+    }
+
+    .confirmation-test-notice-title {
+      color: #7a4a0b;
+      font-size: 1.04rem;
+      font-weight: 900;
+      line-height: 1.5;
+    }
+
+    .confirmation-test-notice-message {
+      margin: 10px 0 0;
+      color: #324155;
+      font-size: 0.94rem;
+      font-weight: 700;
+      line-height: 1.8;
+    }
+
     .homework-status {
       margin-top: 16px;
       padding: 18px;
@@ -812,6 +836,10 @@
     <section id="welcome-panel" class="panel" style="display: none;">
       <div id="welcome-badge" class="welcome-badge" style="display: none;"></div>
       <div id="welcome-name" class="welcome-name" style="display: none;"></div>
+      <section class="confirmation-test-notice" aria-labelledby="confirmation-test-notice-title">
+        <div id="confirmation-test-notice-title" class="confirmation-test-notice-title">確認テストに関するお知らせ</div>
+        <p class="confirmation-test-notice-message">先ほどの確認テストに関する連絡について、システム上の表示に一部不整合がある可能性が判明しました。クイズTOPで第1〜9回がすべて「クリア済み」と表示されている方は、対応不要です。未クリア表示の方についても現在記録を確認しています。皆さんに不利益が生じないよう対応しますので、現時点では再受験する必要はありません。</p>
+      </section>
       <section id="homework-status" class="homework-status is-loading" style="display: none;" aria-live="polite" aria-atomic="true">
         <div class="homework-status-head">
           <div>

@@ -9,6 +9,17 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const indexPath = path.resolve(scriptDir, "..", "index.html");
 const source = fs.readFileSync(indexPath, "utf8");
 
+const confirmationTestNotice =
+  "先ほどの確認テストに関する連絡について、システム上の表示に一部不整合がある可能性が判明しました。クイズTOPで第1〜9回がすべて「クリア済み」と表示されている方は、対応不要です。未クリア表示の方についても現在記録を確認しています。皆さんに不利益が生じないよう対応しますので、現時点では再受験する必要はありません。";
+if ((source.match(new RegExp(confirmationTestNotice, "g")) || []).length !== 1) {
+  throw new Error("確認テストに関するお知らせが正しい文面で1件表示されていません");
+}
+const noticeStart = source.indexOf('<section class="confirmation-test-notice"');
+const homeworkCardStart = source.indexOf('<section id="homework-status"');
+if (noticeStart < 0 || noticeStart > homeworkCardStart) {
+  throw new Error("確認テストに関するお知らせを宿題提出状況より前に表示してください");
+}
+
 const requiredMarkers = [
   "function getHomeworkUnavailablePresentation(status, data = {})",
   "if (status === 401)",
@@ -30,7 +41,6 @@ if (missingMarkers.length) {
   throw new Error(`宿題エラー表示の分岐が不足しています: ${missingMarkers.join(", ")}`);
 }
 
-const homeworkCardStart = source.indexOf('<section id="homework-status"');
 const homeworkCardEnd = source.indexOf('</section>', homeworkCardStart);
 if (homeworkCardStart < 0 || homeworkCardEnd < 0) {
   throw new Error("宿題提出状況カードを確認できません");
