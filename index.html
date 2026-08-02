@@ -816,19 +816,19 @@
         <div class="homework-status-head">
           <div>
             <div class="homework-status-kicker">宿題のお知らせ</div>
-            <div id="homework-status-title" class="homework-status-title">宿題の提出状況</div>
+            <div id="homework-status-title" class="homework-status-title">宿題の提出記録</div>
           </div>
           <div id="homework-status-badge" class="homework-status-badge">確認中</div>
         </div>
-        <p id="homework-status-summary" class="homework-status-summary">提出状況を確認しています。</p>
+        <p id="homework-status-summary" class="homework-status-summary">Googleフォームと確認済みのメール提出を確認しています。</p>
         <p class="homework-status-deadline">宿題の提出期限：<time datetime="2026-08-15">8月15日まで</time></p>
         <div id="homework-status-breakdown" class="homework-status-breakdown" style="display: none;">
           <div class="homework-status-row">
-            <span>提出済み</span>
+            <span>提出を確認済み</span>
             <strong id="homework-submitted-labels">—</strong>
           </div>
           <div class="homework-status-row is-missing">
-            <span>未提出</span>
+            <span>システムで確認できない回</span>
             <strong id="homework-missing-labels">—</strong>
           </div>
         </div>
@@ -1370,7 +1370,7 @@
       if (status === 503 && isStale) {
         return {
           badge: "最新情報を確認できません",
-          summary: "提出データを最新の状態で確認できないため、提出済み・未提出は表示していません。少し時間をおいて画面を開き直してください。"
+          summary: "提出データを最新の状態で確認できないため、確認済み・未確認の回は表示していません。少し時間をおいて画面を開き直してください。"
         };
       }
       if (status === 503) {
@@ -1394,7 +1394,7 @@
     function renderHomeworkUnavailable({ badge, summary } = getHomeworkUnavailablePresentation(0)) {
       homeworkStatus.classList.remove("is-loading", "is-complete", "is-missing");
       homeworkStatus.classList.add("is-unavailable");
-      homeworkStatusTitle.textContent = "宿題の提出状況";
+      homeworkStatusTitle.textContent = "宿題の提出記録";
       homeworkStatusBadge.textContent = badge;
       homeworkStatusSummary.textContent = summary;
       homeworkStatusBreakdown.style.display = "none";
@@ -1419,9 +1419,9 @@
       const isComplete = data.is_complete === true;
       homeworkStatus.classList.remove("is-loading", "is-complete", "is-missing", "is-unavailable");
       homeworkStatus.classList.add(isComplete ? "is-complete" : "is-missing");
-      homeworkStatusTitle.textContent = subjectLabel;
-      homeworkStatusBadge.textContent = isComplete ? "すべて提出済み" : `未提出 ${missingCount}回`;
-      homeworkStatusSummary.textContent = `全${totalCount}回のうち${submittedCount}回を提出済みです。`;
+      homeworkStatusTitle.textContent = `${subjectLabel}（提出記録）`;
+      homeworkStatusBadge.textContent = isComplete ? "全回確認済み" : `システムで未確認 ${missingCount}回`;
+      homeworkStatusSummary.textContent = `Googleフォームと確認済みのメール提出を集計し、全${totalCount}回のうち${submittedCount}回を確認できています。メール提出は順次確認して反映するため、送信済みの場合は表示と行き違うことがあります。`;
       homeworkSubmittedLabels.textContent = formatHomeworkLabels(data.submitted_labels, submittedCount);
       homeworkMissingLabels.textContent = formatHomeworkLabels(data.missing_labels, missingCount);
       homeworkStatusBreakdown.style.display = "grid";

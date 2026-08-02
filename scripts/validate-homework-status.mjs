@@ -16,6 +16,13 @@ const requiredMarkers = [
   "if (status === 422)",
   "if (status === 503)",
   "8桁の学籍番号と学科の登録が必要です。",
+  "宿題の提出記録",
+  "提出を確認済み",
+  "システムで確認できない回",
+  '"全回確認済み"',
+  "`システムで未確認 ${missingCount}回`",
+  "Googleフォームと確認済みのメール提出を集計し",
+  "メール提出は順次確認して反映するため、送信済みの場合は表示と行き違うことがあります。",
   "renderHomeworkUnavailable(getHomeworkUnavailablePresentation(unavailableStatus, data))",
 ];
 const missingMarkers = requiredMarkers.filter((marker) => !source.includes(marker));
@@ -39,6 +46,17 @@ const missingDeadlineMarkers = requiredDeadlineMarkers.filter(
 );
 if (missingDeadlineMarkers.length) {
   throw new Error(`宿題の提出期限表示が不足しています: ${missingDeadlineMarkers.join(", ")}`);
+}
+
+const unsafeAbsoluteStatusMarkers = [
+  '<span>提出済み</span>',
+  '<span>未提出</span>',
+  '"すべて提出済み"',
+  "`未提出 ${missingCount}回`",
+];
+const presentUnsafeMarkers = unsafeAbsoluteStatusMarkers.filter((marker) => source.includes(marker));
+if (presentUnsafeMarkers.length) {
+  throw new Error(`フォーム以外の提出を断定する表示が残っています: ${presentUnsafeMarkers.join(", ")}`);
 }
 
 const presentationStart = source.indexOf("function getHomeworkUnavailablePresentation");
@@ -169,9 +187,89 @@ await verifyUnavailableCase({
   status: 503,
   data: { stale: true },
   expectedBadge: "最新情報を確認できません",
-  summaryPart: "提出済み・未提出は表示していません",
+  summaryPart: "確認済み・未確認の回は表示していません",
 });
 await verifyUnavailableCase({ fetchError: true, expectedBadge: "通信エラー", summaryPart: "通信環境" });
+
+const progressRenderStart = source.indexOf("function renderHomeworkProgress");
+const progressRenderEnd = source.indexOf("async function loadHomeworkProgress", progressRenderStart);
+if (progressRenderStart < 0 || progressRenderEnd < 0) {
+  throw new Error("宿題の提出記録表示関数を抽出できません");
+}
+const progressRenderSource = source.slice(progressRenderStart, progressRenderEnd);
+const makeProgressHarness = new Function(
+  "nodes",
+  `
+    const homeworkStatus = nodes.homeworkStatus;
+    const homeworkStatusTitle = nodes.homeworkStatusTitle;
+    const homeworkStatusBadge = nodes.homeworkStatusBadge;
+    const homeworkStatusSummary = nodes.homeworkStatusSummary;
+    const homeworkStatusBreakdown = nodes.homeworkStatusBreakdown;
+    const homeworkSubmittedLabels = nodes.homeworkSubmittedLabels;
+    const homeworkMissingLabels = nodes.homeworkMissingLabels;
+    const formatHomeworkLabels = (labels, count) => {
+      const normalized = Array.isArray(labels)
+        ? labels.map((label) => String(label || "").trim()).filter(Boolean)
+        : [];
+      return normalized.length > 0 ? normalized.join("・") : (count === 0 ? "なし" : String(count) + "回");
+    };
+    ${progressRenderSource}
+    return { renderHomeworkProgress };
+  `
+);
+
+function verifyProgressCase({ data, expectedBadge, expectedClass }) {
+  const nodes = createNodes();
+  nodes.homeworkSubmittedLabels = { textContent: "" };
+  nodes.homeworkMissingLabels = { textContent: "" };
+  const { renderHomeworkProgress } = makeProgressHarness(nodes);
+  renderHomeworkProgress(data);
+  const expectedTitle = `${data.subject_label}（提出記録）`;
+  if (nodes.homeworkStatusTitle.textContent !== expectedTitle) {
+    throw new Error(`回答記録のタイトルが不正です: ${nodes.homeworkStatusTitle.textContent}`);
+  }
+  if (nodes.homeworkStatusBadge.textContent !== expectedBadge) {
+    throw new Error(`回答記録のbadgeが不正です: ${nodes.homeworkStatusBadge.textContent}`);
+  }
+  const summary = nodes.homeworkStatusSummary.textContent;
+  if (
+    !summary.includes(`全${data.total_count}回のうち${data.submitted_count}回を確認`) ||
+    !summary.includes("Googleフォームと確認済みのメール提出を集計し") ||
+    !summary.includes("メール提出は順次確認して反映するため、送信済みの場合は表示と行き違うことがあります。")
+  ) {
+    throw new Error(`回答記録の注意書きが不正です: ${summary}`);
+  }
+  if (!nodes.classes.has(expectedClass) || nodes.homeworkStatusBreakdown.style.display !== "grid") {
+    throw new Error(`回答記録の表示状態が不正です: ${Array.from(nodes.classes).join(",")}`);
+  }
+}
+
+verifyProgressCase({
+  data: {
+    total_count: 5,
+    submitted_count: 4,
+    missing_count: 1,
+    is_complete: false,
+    subject_label: "人体の構造と機能",
+    submitted_labels: ["第1回", "第2回", "第3回", "第4回"],
+    missing_labels: ["第5回"],
+  },
+  expectedBadge: "システムで未確認 1回",
+  expectedClass: "is-missing",
+});
+verifyProgressCase({
+  data: {
+    total_count: 5,
+    submitted_count: 5,
+    missing_count: 0,
+    is_complete: true,
+    subject_label: "人体の構造と機能",
+    submitted_labels: ["第1回", "第2回", "第3回", "第4回", "第5回"],
+    missing_labels: [],
+  },
+  expectedBadge: "全回確認済み",
+  expectedClass: "is-complete",
+});
 
 const inlineScripts = Array.from(
   source.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi),
