@@ -1332,12 +1332,59 @@
       return count === 0 ? "なし" : `${count}回`;
     }
 
-    function renderHomeworkUnavailable() {
+    function getHomeworkUnavailablePresentation(status, data = {}) {
+      const isStale =
+        data.stale === true ||
+        data.status === "stale" ||
+        data.source_status === "stale";
+      if (status === 401) {
+        return {
+          badge: "LINEログインを確認",
+          summary: "LINEログインを確認できませんでした。LINEからクイズ画面を開き直してください。"
+        };
+      }
+      if (status === 404) {
+        return {
+          badge: "学生情報未登録",
+          summary: "出席君に学生情報が登録されていません。LINEで「出席」と送信して登録してください。"
+        };
+      }
+      if (status === 422) {
+        return {
+          badge: "登録情報を確認",
+          summary: "宿題の提出状況を表示するには、8桁の学籍番号と学科の登録が必要です。出席君の登録情報を確認してください。"
+        };
+      }
+      if (status === 503 && isStale) {
+        return {
+          badge: "最新情報を確認できません",
+          summary: "提出データを最新の状態で確認できないため、提出済み・未提出は表示していません。少し時間をおいて画面を開き直してください。"
+        };
+      }
+      if (status === 503) {
+        return {
+          badge: "一時的に確認できません",
+          summary: "宿題データを現在取得できません。少し時間をおいて画面を開き直してください。クイズはそのまま利用できます。"
+        };
+      }
+      if (status === 500) {
+        return {
+          badge: "一時的なエラー",
+          summary: "一時的なエラーで宿題の提出状況を表示できません。少し時間をおいて画面を開き直してください。クイズはそのまま利用できます。"
+        };
+      }
+      return {
+        badge: "通信エラー",
+        summary: "通信状況により宿題の提出状況を確認できませんでした。通信環境を確認して画面を開き直してください。クイズはそのまま利用できます。"
+      };
+    }
+
+    function renderHomeworkUnavailable({ badge, summary } = getHomeworkUnavailablePresentation(0)) {
       homeworkStatus.classList.remove("is-loading", "is-complete", "is-missing");
       homeworkStatus.classList.add("is-unavailable");
       homeworkStatusTitle.textContent = "宿題の提出状況";
-      homeworkStatusBadge.textContent = "確認できません";
-      homeworkStatusSummary.textContent = "宿題の提出状況は現在確認できません。クイズはそのまま利用できます。";
+      homeworkStatusBadge.textContent = badge;
+      homeworkStatusSummary.textContent = summary;
       homeworkStatusBreakdown.style.display = "none";
     }
 
@@ -1369,8 +1416,12 @@
     }
 
     async function loadHomeworkProgress(accessToken) {
-      if (!accessToken || !apiBaseUrl) {
-        renderHomeworkUnavailable();
+      if (!accessToken) {
+        renderHomeworkUnavailable(getHomeworkUnavailablePresentation(401));
+        return;
+      }
+      if (!apiBaseUrl) {
+        renderHomeworkUnavailable(getHomeworkUnavailablePresentation(503));
         return;
       }
 
@@ -1390,14 +1441,15 @@
           data.status === "stale" ||
           data.source_status === "stale";
         if (!response.ok || data.ok === false || data.available === false || isStale) {
-          renderHomeworkUnavailable();
+          const unavailableStatus = isStale ? 503 : response.status;
+          renderHomeworkUnavailable(getHomeworkUnavailablePresentation(unavailableStatus, data));
           return;
         }
 
         renderHomeworkProgress(data);
       } catch (error) {
         console.error("Homework progress fetch failed:", error);
-        renderHomeworkUnavailable();
+        renderHomeworkUnavailable(getHomeworkUnavailablePresentation(0));
       }
     }
 
