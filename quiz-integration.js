@@ -12,6 +12,11 @@
     initPromise: null,
     ready: false,
     profile: null,
+    submission: {
+      phase: "idle",
+      activePromise: null,
+      lastResult: null,
+    },
   };
   const PASS_PERCENTAGE = 80;
 
@@ -104,8 +109,79 @@
     if (!element) {
       return;
     }
+    const resultContainer = document.getElementById("result-container");
+    if (
+      resultContainer &&
+      resultContainer.parentNode &&
+      element.parentNode === resultContainer.parentNode &&
+      element.nextSibling !== resultContainer
+    ) {
+      resultContainer.parentNode.insertBefore(element, resultContainer);
+    }
     decorateCard(element, tone);
+    element.setAttribute("role", tone === "error" ? "alert" : "status");
+    element.setAttribute("aria-live", tone === "error" ? "assertive" : "polite");
+    element.style.fontSize = "1.05rem";
+    element.style.fontWeight = "600";
+    element.style.lineHeight = "1.6";
+    element.style.padding = "18px";
+    element.style.boxShadow = "0 8px 24px rgba(15, 23, 42, 0.12)";
     element.innerHTML = html;
+  }
+
+  function getResultActionButtons() {
+    const resultContainer = document.getElementById("result-container");
+    if (!resultContainer || typeof resultContainer.querySelectorAll !== "function") {
+      return [];
+    }
+    return Array.from(resultContainer.querySelectorAll("button.nav-button"));
+  }
+
+  function setSubmissionPhase(phase) {
+    state.submission.phase = phase;
+    const saving = phase === "saving";
+    getResultActionButtons().forEach((button) => {
+      button.disabled = saving;
+      button.setAttribute("aria-disabled", saving ? "true" : "false");
+      button.style.opacity = saving ? "0.55" : "";
+      button.style.cursor = saving ? "wait" : "";
+    });
+    if (document.documentElement) {
+      document.documentElement.setAttribute("data-quiz-save-state", phase);
+    }
+  }
+
+  function preventLeaveWhileSaving(event) {
+    if (state.submission.phase !== "saving") {
+      return;
+    }
+    event.preventDefault();
+    event.returnValue = "";
+  }
+
+  function appendRetryButton() {
+    const element = document.getElementById("attendance-link");
+    if (!element || !state.submission.lastResult || document.getElementById("quiz-save-retry")) {
+      return;
+    }
+    const button = document.createElement("button");
+    button.id = "quiz-save-retry";
+    button.type = "button";
+    button.textContent = "結果の保存を再試行";
+    button.style.display = "block";
+    button.style.margin = "14px auto 0";
+    button.style.padding = "12px 20px";
+    button.style.border = "0";
+    button.style.borderRadius = "999px";
+    button.style.background = "#b91c1c";
+    button.style.color = "#fff";
+    button.style.font = "inherit";
+    button.style.fontWeight = "700";
+    button.style.cursor = "pointer";
+    button.addEventListener("click", () => {
+      submitQuizResult(state.submission.lastResult);
+    });
+    element.appendChild(button);
   }
 
   function formatDelta(value) {
@@ -224,37 +300,47 @@
     });
   }
 
-  async function submitQuizResult(result) {
+  async function performQuizResultSubmission(result) {
     const quizNo = result.quizNo || getQuizNo();
     if (!quizNo) {
-      setResult("クイズ番号を判定できないため、結果を保存できませんでした。", "error");
-      return { ok: false };
+      setResult(
+        "<p><strong>保存できませんでした</strong></p><p>クイズ番号を判定できませんでした。この画面を閉じず、担当教員へお知らせください。</p>",
+        "error"
+      );
+      return { ok: false, retryable: false };
     }
 
     await initLiff();
     if (!state.ready) {
       if (isLocalPreview()) {
-        setResult("プレビュー表示中のため、この結果は保存されません。", "info");
+        setResult("<p><strong>プレビュー中です</strong></p><p>この結果は保存されません。</p>", "info");
       }
       if (!isLiffConfigured()) {
-        setResult("LIFF ID が未設定のため、結果保存はまだ有効化されていません。", "warning");
+        setResult(
+          "<p><strong>保存できませんでした</strong></p><p>LINEログインが設定されていません。</p>",
+          "warning"
+        );
       }
-      return { ok: false };
+      return { ok: false, retryable: false };
     }
 
     const accessToken = window.liff.getAccessToken();
     if (!accessToken) {
-      setResult("LINE アクセストークンを取得できませんでした。", "error");
-      return { ok: false };
+      setResult(
+        "<p><strong>保存できませんでした</strong></p><p>LINEログイン情報を取得できませんでした。この画面を閉じず、通信状態を確認してください。</p>",
+        "error"
+      );
+      return { ok: false, retryable: true };
     }
 
     const apiBaseUrl = getApiBaseUrl();
     if (!apiBaseUrl) {
-      setResult("API の接続先が設定されていません。", "error");
-      return { ok: false };
+      setResult(
+        "<p><strong>保存できませんでした</strong></p><p>結果の保存先が設定されていません。この画面を閉じず、担当教員へお知らせください。</p>",
+        "error"
+      );
+      return { ok: false, retryable: false };
     }
-
-    setResult("結果を保存しています...", "info");
 
     const theme =
       (window.quizTheme && window.quizTheme.get && window.quizTheme.get()) ||
@@ -291,8 +377,11 @@
           (response.status === 404
             ? "学生情報が見つかりません。先にLINEで「出席」を送信して初回登録してください。"
             : "結果の保存に失敗しました。");
-        setResult(message, response.status === 404 ? "warning" : "error");
-        return { ok: false, error: message };
+        setResult(
+          `<p><strong>保存できませんでした</strong></p><p>${message}</p><p>今回の結果はまだ記録されていません。</p>`,
+          response.status === 404 ? "warning" : "error"
+        );
+        return { ok: false, error: message, retryable: response.status !== 404 };
       }
 
       const progressLines = [
@@ -327,24 +416,71 @@
       }
 
       const savedMessage = data.passed
-        ? `<p><strong>${data.name}さんの結果を記録しました。</strong></p>${progressLines.join("")}`
-        : `<p><strong>${data.name}さんの挑戦を記録しました。</strong></p>${progressLines.join("")}`;
+        ? `<p><strong>保存完了：${data.name}さんの結果を記録しました。</strong></p>${progressLines.join("")}`
+        : `<p><strong>保存完了：${data.name}さんの挑戦を記録しました。</strong></p>${progressLines.join("")}`;
       setResult(savedMessage, data.passed ? "success" : "warning");
       return { ok: true, data };
     } catch (error) {
       console.error(error);
-      setResult(`通信エラーのため結果を保存できませんでした: ${error.message}`, "error");
-      return { ok: false, error: error.message };
+      setResult(
+        `<p><strong>保存できませんでした</strong></p><p>通信エラーが発生しました。この画面を閉じず、通信状態を確認して「結果の保存を再試行」を押してください。</p>`,
+        "error"
+      );
+      return { ok: false, error: error.message, retryable: true };
     }
   }
 
+  function submitQuizResult(result) {
+    if (state.submission.activePromise) {
+      return state.submission.activePromise;
+    }
+
+    state.submission.lastResult = result;
+    setSubmissionPhase("saving");
+    setResult(
+      "<p><strong>結果を保存しています</strong></p><p>保存完了と表示されるまで、この画面を閉じたり移動したりしないでください。</p>",
+      "info"
+    );
+
+    const activePromise = performQuizResultSubmission(result)
+      .then((outcome) => {
+        setSubmissionPhase(outcome.ok ? "saved" : "failed");
+        if (!outcome.ok && outcome.retryable) {
+          appendRetryButton();
+        }
+        return outcome;
+      })
+      .catch((error) => {
+        console.error(error);
+        setResult(
+          "<p><strong>保存できませんでした</strong></p><p>予期しないエラーが発生しました。この画面を閉じず、「結果の保存を再試行」を押してください。</p>",
+          "error"
+        );
+        setSubmissionPhase("failed");
+        appendRetryButton();
+        return { ok: false, error: error.message, retryable: true };
+      })
+      .finally(() => {
+        state.submission.activePromise = null;
+      });
+
+    state.submission.activePromise = activePromise;
+    return activePromise;
+  }
+
   function resetResultMessage() {
+    if (state.submission.phase === "saving") {
+      return false;
+    }
+    state.submission.lastResult = null;
+    setSubmissionPhase("idle");
     const element = document.getElementById("attendance-link");
     if (!element) {
-      return;
+      return true;
     }
     element.innerHTML = "";
     element.style.display = "none";
+    return true;
   }
 
   window.quizIntegration = {
@@ -359,4 +495,5 @@
   document.addEventListener("DOMContentLoaded", () => {
     initLiff();
   });
+  window.addEventListener("beforeunload", preventLeaveWhileSaving);
 })();

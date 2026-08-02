@@ -534,7 +534,7 @@
       }
     }
 
-    function showResult() {
+    async function showResult() {
       score = userAnswers.reduce((total, answer, index) => 
         total + (answer === quizData[index].answer ? 1 : 0), 0);
 
@@ -570,7 +570,7 @@
       resultContainer.innerHTML = resultHtml;
 
       if (window.quizIntegration) {
-        window.quizIntegration.submitQuizResult({
+        await window.quizIntegration.submitQuizResult({
           quizNo: window.quizIntegration.getQuizNo(),
           quizTitle: document.title,
           score,
@@ -604,7 +604,7 @@
   </script>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script src="quiz-auth-config.js"></script>
-  <script src="quiz-integration.js"></script>
+  <script src="quiz-integration.js?v=20260802-save-guard"></script>
   <script src="quiz-navigation.js?v=20260728-quiz-ui-3"></script>
   <script src="quiz-progress.js?v=20260729-progress"></script>
   <script src="quiz-effects.js?v=20260728-canvas-petals"></script>
