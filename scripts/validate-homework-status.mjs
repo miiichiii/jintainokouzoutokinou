@@ -23,6 +23,24 @@ if (missingMarkers.length) {
   throw new Error(`宿題エラー表示の分岐が不足しています: ${missingMarkers.join(", ")}`);
 }
 
+const homeworkCardStart = source.indexOf('<section id="homework-status"');
+const homeworkCardEnd = source.indexOf('</section>', homeworkCardStart);
+if (homeworkCardStart < 0 || homeworkCardEnd < 0) {
+  throw new Error("宿題提出状況カードを確認できません");
+}
+const homeworkCardSource = source.slice(homeworkCardStart, homeworkCardEnd);
+const requiredDeadlineMarkers = [
+  'class="homework-status-deadline"',
+  'datetime="2026-08-15"',
+  "8月15日まで",
+];
+const missingDeadlineMarkers = requiredDeadlineMarkers.filter(
+  (marker) => !homeworkCardSource.includes(marker)
+);
+if (missingDeadlineMarkers.length) {
+  throw new Error(`宿題の提出期限表示が不足しています: ${missingDeadlineMarkers.join(", ")}`);
+}
+
 const presentationStart = source.indexOf("function getHomeworkUnavailablePresentation");
 const presentationEnd = source.indexOf("function renderHomeworkUnavailable", presentationStart);
 const presentationSource = source.slice(presentationStart, presentationEnd);

@@ -413,6 +413,17 @@
       line-height: 1.7;
     }
 
+    .homework-status-deadline {
+      margin: 10px 0 0;
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: rgba(209, 135, 41, 0.12);
+      color: #7a4a0b;
+      font-size: 0.9rem;
+      font-weight: 900;
+      line-height: 1.6;
+    }
+
     .homework-status-breakdown {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -810,6 +821,7 @@
           <div id="homework-status-badge" class="homework-status-badge">確認中</div>
         </div>
         <p id="homework-status-summary" class="homework-status-summary">提出状況を確認しています。</p>
+        <p class="homework-status-deadline">宿題の提出期限：<time datetime="2026-08-15">8月15日まで</time></p>
         <div id="homework-status-breakdown" class="homework-status-breakdown" style="display: none;">
           <div class="homework-status-row">
             <span>提出済み</span>
