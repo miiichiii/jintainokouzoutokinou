@@ -516,6 +516,28 @@
       box-shadow: 0 10px 24px rgba(84, 101, 140, 0.08);
     }
 
+    .welcome-stat-button {
+      width: 100%;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      appearance: none;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .welcome-stat-button:hover,
+    .welcome-stat-button:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(44, 123, 229, 0.24);
+      box-shadow: 0 14px 28px rgba(84, 101, 140, 0.14);
+    }
+
+    .welcome-stat-button:focus-visible {
+      outline: 3px solid rgba(44, 123, 229, 0.58);
+      outline-offset: 3px;
+    }
+
     .welcome-stat-label {
       font-size: 0.8rem;
       color: #66758d;
@@ -527,6 +549,13 @@
       font-weight: 800;
       letter-spacing: -0.04em;
       color: #173665;
+    }
+
+    .welcome-stat-hint {
+      margin-top: 6px;
+      color: #516078;
+      font-size: 0.76rem;
+      font-weight: 800;
     }
 
     .welcome-chart {
@@ -555,6 +584,184 @@
       color: #6b7280;
       font-size: 0.9rem;
       line-height: 1.8;
+    }
+
+    .welcome-chart-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .welcome-chart-head .welcome-chart-title {
+      margin-bottom: 0;
+    }
+
+    .welcome-chart-select {
+      min-width: 180px;
+      min-height: 38px;
+      padding: 7px 34px 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(84, 104, 142, 0.18);
+      background: rgba(255, 255, 255, 0.84);
+      color: #243247;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .quiz-progress {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(246, 248, 255, 0.7)),
+        linear-gradient(135deg, rgba(156, 232, 223, 0.18), rgba(255, 201, 223, 0.16));
+      border: 1px solid rgba(84, 104, 142, 0.1);
+      box-shadow: 0 10px 24px rgba(84, 101, 140, 0.08);
+    }
+
+    .quiz-progress h3 {
+      margin: 0;
+      color: #173665;
+      font-size: 1.04rem;
+      font-family: "Noto Sans JP", sans-serif;
+    }
+
+    .quiz-progress-copy {
+      margin: 7px 0 14px;
+      color: #66758d;
+      font-size: 0.86rem;
+      line-height: 1.7;
+    }
+
+    .quiz-progress-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quiz-progress-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(84, 104, 142, 0.1);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 8px 18px rgba(78, 94, 130, 0.06);
+    }
+
+    .quiz-progress-main {
+      min-width: 0;
+    }
+
+    .quiz-progress-title {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      color: #243247;
+      font-weight: 900;
+      line-height: 1.5;
+    }
+
+    .quiz-progress-title small {
+      color: #53627a;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .quiz-progress-status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .quiz-progress-status.is-perfect {
+      background: rgba(255, 244, 204, 0.96);
+      color: #9a5c00;
+    }
+
+    .quiz-progress-status.is-cleared {
+      background: rgba(220, 252, 231, 0.92);
+      color: #166534;
+    }
+
+    .quiz-progress-status.is-incomplete {
+      background: rgba(252, 231, 243, 0.92);
+      color: #9f1239;
+    }
+
+    .quiz-progress-status.is-unattempted {
+      background: rgba(229, 231, 235, 0.92);
+      color: #4b5563;
+    }
+
+    .quiz-progress-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .quiz-progress-metric {
+      min-width: 0;
+      padding: 9px 10px;
+      border-radius: 14px;
+      background: rgba(246, 248, 255, 0.78);
+      color: #324155;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .quiz-progress-metric span,
+    .quiz-progress-metric strong {
+      display: block;
+    }
+
+    .quiz-progress-metric span {
+      color: #66758d;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .quiz-progress-metric strong {
+      margin-top: 2px;
+      overflow-wrap: anywhere;
+      color: #173665;
+      font-size: 0.88rem;
+      font-weight: 900;
+    }
+
+    .quiz-progress-action {
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 108px;
+      min-height: 42px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: #2c7be5;
+      color: #ffffff;
+      font-size: 0.88rem;
+      font-weight: 900;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 10px 20px rgba(44, 123, 229, 0.2);
+    }
+
+    .quiz-progress-action.is-muted {
+      background: rgba(225, 229, 238, 0.82);
+      color: #667488;
+      box-shadow: inset 0 0 0 1px rgba(120, 133, 154, 0.12);
     }
 
     .panel-copy {
@@ -807,6 +1014,31 @@
         grid-template-columns: 1fr;
       }
 
+      .welcome-chart-head {
+        display: block;
+      }
+
+      .welcome-chart-select {
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .quiz-progress {
+        padding: 14px;
+      }
+
+      .quiz-progress-item {
+        grid-template-columns: 1fr;
+      }
+
+      .quiz-progress-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .quiz-progress-action {
+        width: 100%;
+      }
+
       .card {
         min-height: 230px;
         padding: 20px;
@@ -868,10 +1100,11 @@
           <div class="welcome-stat-label">通算挑戦</div>
           <div id="welcome-total-attempts" class="welcome-stat-value">0</div>
         </div>
-        <div class="welcome-stat">
+        <button id="welcome-cleared-stat" class="welcome-stat welcome-stat-button" type="button" aria-expanded="false" aria-controls="welcome-quiz-progress">
           <div class="welcome-stat-label">クリア済み</div>
           <div id="welcome-cleared-count" class="welcome-stat-value">0 / 0</div>
-        </div>
+          <div id="welcome-cleared-hint" class="welcome-stat-hint">確認テスト別の統計を表示</div>
+        </button>
         <div class="welcome-stat">
           <div class="welcome-stat-label">満点クリア</div>
           <div id="welcome-perfect" class="welcome-stat-value">0</div>
@@ -881,6 +1114,11 @@
           <div id="welcome-completion" class="welcome-stat-value">0%</div>
         </div>
       </div>
+      <section id="welcome-quiz-progress" class="quiz-progress" style="display: none;" aria-labelledby="welcome-quiz-progress-title">
+        <h3 id="welcome-quiz-progress-title">確認テスト別の統計</h3>
+        <p class="quiz-progress-copy">第1〜9回について、LINEに保存されている最高点・挑戦回数・直近結果を表示します。</p>
+        <div id="welcome-quiz-progress-list" class="quiz-progress-list"></div>
+      </section>
       <div id="welcome-chart" class="welcome-chart" style="display: none;"></div>
     </section>
 
@@ -931,14 +1169,21 @@
     const welcomeClearedList = document.getElementById("welcome-cleared-list");
     const welcomeStats = document.getElementById("welcome-stats");
     const welcomeTotalAttempts = document.getElementById("welcome-total-attempts");
+    const welcomeClearedStat = document.getElementById("welcome-cleared-stat");
     const welcomeCleared = document.getElementById("welcome-cleared-count");
+    const welcomeClearedHint = document.getElementById("welcome-cleared-hint");
     const welcomePerfect = document.getElementById("welcome-perfect");
     const welcomeCompletion = document.getElementById("welcome-completion");
+    const welcomeQuizProgress = document.getElementById("welcome-quiz-progress");
+    const welcomeQuizProgressList = document.getElementById("welcome-quiz-progress-list");
     const welcomeChart = document.getElementById("welcome-chart");
     const apiBaseUrl = String((window.QUIZ_RUNTIME_CONFIG || {}).apiBaseUrl || "").replace(/\/$/, "");
     const quizSet = String((window.QUIZ_RUNTIME_CONFIG || {}).quizSet || "jintainokouzoutokinou").trim();
     const liffId = String((window.QUIZ_RUNTIME_CONFIG || {}).liffId || "").trim();
     let clearedQuizNumbers = new Set();
+    let welcomeProgressData = null;
+    let activeChartQuizNo = "all";
+    let quizProgressOpen = false;
 
     const icons = {
       skull: [
@@ -1217,14 +1462,181 @@
       return labels.join(" / ");
     }
 
-    function buildProgressChart(history) {
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getConfirmationTestLessons() {
+      return lessons.filter((lesson) => lesson.no >= 1 && lesson.no <= 9);
+    }
+
+    function finiteProgressNumber(value, fallback = 0) {
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? numeric : fallback;
+    }
+
+    function formatProgressScore(score, totalQuestions, percentage, hasRecord) {
+      if (!hasRecord) {
+        return "記録なし";
+      }
+      const normalizedPercentage = finiteProgressNumber(percentage);
+      const normalizedTotal = finiteProgressNumber(totalQuestions);
+      if (normalizedTotal > 0) {
+        return `${finiteProgressNumber(score)}/${normalizedTotal}問 (${normalizedPercentage.toFixed(1)}%)`;
+      }
+      return `${normalizedPercentage.toFixed(1)}%`;
+    }
+
+    function formatProgressDate(value) {
+      const time = Date.parse(String(value || ""));
+      if (!Number.isFinite(time)) {
+        return "記録なし";
+      }
+      return new Intl.DateTimeFormat("ja-JP", {
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: "Asia/Tokyo"
+      }).format(new Date(time));
+    }
+
+    function buildConfirmationTestProgressRows(data) {
+      const sourceRows = Array.isArray(data?.quiz_progress) ? data.quiz_progress : [];
+      const progressByQuiz = new Map(
+        sourceRows
+          .filter((row) => row && typeof row === "object")
+          .map((row) => [Number(row.quiz_no), row])
+          .filter(([quizNo]) => Number.isFinite(quizNo))
+      );
+      const serverCleared = new Set(
+        (Array.isArray(data?.cleared_quiz_numbers) ? data.cleared_quiz_numbers : [])
+          .map((value) => Number(value))
+          .filter((value) => Number.isFinite(value))
+      );
+      const serverPerfect = new Set(
+        (Array.isArray(data?.perfect_quiz_numbers) ? data.perfect_quiz_numbers : [])
+          .map((value) => Number(value))
+          .filter((value) => Number.isFinite(value))
+      );
+
+      return getConfirmationTestLessons().map((lesson) => {
+        const progress = progressByQuiz.get(lesson.no) || null;
+        const attemptCount = Math.max(0, finiteProgressNumber(progress?.attempt_count));
+        const bestPercentage = finiteProgressNumber(progress?.best_percentage);
+        const latestPercentage = finiteProgressNumber(progress?.latest_percentage);
+        const hasRecord = Boolean(progress) && (
+          attemptCount > 0 ||
+          finiteProgressNumber(progress?.best_total_questions) > 0 ||
+          Boolean(progress?.latest_submitted_at)
+        );
+        const isCleared = progress?.passed === true || serverCleared.has(lesson.no);
+        const isPerfect = isCleared && (serverPerfect.has(lesson.no) || bestPercentage >= 100);
+        const status = isPerfect
+          ? { label: "満点クリア", className: "is-perfect" }
+          : isCleared
+            ? { label: "クリア済み", className: "is-cleared" }
+            : hasRecord
+              ? { label: "未クリア", className: "is-incomplete" }
+              : { label: "未挑戦", className: "is-unattempted" };
+
+        return {
+          lesson,
+          attemptCount,
+          hasRecord,
+          isCleared,
+          status,
+          bestLabel: formatProgressScore(
+            progress?.best_score,
+            progress?.best_total_questions,
+            bestPercentage,
+            hasRecord
+          ),
+          latestLabel: formatProgressScore(
+            progress?.latest_score,
+            progress?.latest_total_questions,
+            latestPercentage,
+            hasRecord
+          ),
+          latestDateLabel: formatProgressDate(progress?.latest_submitted_at)
+        };
+      });
+    }
+
+    function renderConfirmationTestProgress(data) {
+      const rows = buildConfirmationTestProgressRows(data);
+      welcomeQuizProgressList.innerHTML = rows.map((row) => {
+        const action = isLessonPublished(row.lesson)
+          ? `<a class="quiz-progress-action" href="${buildLessonUrl(row.lesson.href)}">${row.isCleared ? "復習する" : "開く"}</a>`
+          : '<span class="quiz-progress-action is-muted">公開待ち</span>';
+        return `
+          <article class="quiz-progress-item">
+            <div class="quiz-progress-main">
+              <div class="quiz-progress-title">
+                <small>第${row.lesson.no}回</small>
+                <span>${escapeHtml(row.lesson.title)}</span>
+                <span class="quiz-progress-status ${row.status.className}">${row.status.label}</span>
+              </div>
+              <div class="quiz-progress-metrics">
+                <div class="quiz-progress-metric"><span>最高</span><strong>${escapeHtml(row.bestLabel)}</strong></div>
+                <div class="quiz-progress-metric"><span>挑戦</span><strong>${row.attemptCount}回</strong></div>
+                <div class="quiz-progress-metric"><span>直近</span><strong>${escapeHtml(row.latestLabel)}</strong></div>
+                <div class="quiz-progress-metric"><span>最終日時</span><strong>${escapeHtml(row.latestDateLabel)}</strong></div>
+              </div>
+            </div>
+            ${action}
+          </article>
+        `;
+      }).join("");
+    }
+
+    function getProgressChartHistory(selectedQuizNo) {
+      const selected = String(selectedQuizNo || "all");
+      const history = Array.isArray(welcomeProgressData?.attempt_history)
+        ? welcomeProgressData.attempt_history
+        : [];
+      const filtered = selected === "all"
+        ? history
+        : history.filter((item) => Number(item.quiz_no) === Number(selected));
+      return filtered.map((item, index) => ({
+        ...item,
+        sequence: index + 1
+      }));
+    }
+
+    function buildProgressChart(history, selectedQuizNo = "all") {
+      const selected = String(selectedQuizNo || "all");
+      const selectedLesson = getConfirmationTestLessons().find((lesson) => String(lesson.no) === selected);
+      const title = selectedLesson ? `第${selectedLesson.no}回の正答率` : "挑戦ごとの正答率";
+      const options = [
+        `<option value="all"${selected === "all" ? " selected" : ""}>全体</option>`,
+        ...getConfirmationTestLessons().map((lesson) => (
+          `<option value="${lesson.no}"${selected === String(lesson.no) ? " selected" : ""}>第${lesson.no}回 ${escapeHtml(lesson.title)}</option>`
+        ))
+      ].join("");
+      const head = `
+        <div class="welcome-chart-head">
+          <div class="welcome-chart-title">${title}</div>
+          <select id="welcome-chart-select" class="welcome-chart-select" aria-label="正答率の推移を表示する確認テスト">
+            ${options}
+          </select>
+        </div>
+      `;
+
       if (!Array.isArray(history) || history.length === 0) {
         return `
-          <div class="welcome-chart-title">挑戦ごとの正答率</div>
-          <div class="welcome-chart-empty">まだ履歴がありません。最初の挑戦から線が描かれます。</div>
+          ${head}
+          <div class="welcome-chart-empty">この確認テストの挑戦履歴はまだありません。</div>
         `;
       }
 
+      const visibleHistory = history.slice(-24);
       const width = 640;
       const height = 220;
       const left = 42;
@@ -1233,13 +1645,13 @@
       const bottom = 34;
       const innerWidth = width - left - right;
       const innerHeight = height - top - bottom;
-      const maxIndex = Math.max(history.length - 1, 1);
+      const maxIndex = Math.max(visibleHistory.length - 1, 1);
 
-      const points = history.map((item, index) => {
+      const points = visibleHistory.map((item, index) => {
         const x = left + (innerWidth * (index / maxIndex));
         const percentage = Number(item.percentage || 0);
         const y = top + innerHeight - (innerHeight * Math.max(0, Math.min(percentage, 100)) / 100);
-        return { x, y, percentage, quizNo: item.quiz_no, sequence: item.sequence };
+        return { x, y, percentage, sequence: item.sequence };
       });
 
       const polyline = points.map((point) => `${point.x},${point.y}`).join(" ");
@@ -1258,7 +1670,7 @@
       }).join("");
 
       return `
-        <div class="welcome-chart-title">挑戦ごとの正答率</div>
+        ${head}
         <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="挑戦ごとの正答率の折れ線グラフ">
           ${yGuides}
           <polyline fill="none" stroke="#2c7be5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${polyline}"></polyline>
@@ -1267,6 +1679,36 @@
           <text x="${width / 2}" y="${height - 2}" text-anchor="middle" font-size="11" fill="#64748b">挑戦回数</text>
         </svg>
       `;
+    }
+
+    function renderProgressChart() {
+      welcomeChart.innerHTML = buildProgressChart(
+        getProgressChartHistory(activeChartQuizNo),
+        activeChartQuizNo
+      );
+      welcomeChart.style.display = "block";
+      const select = document.getElementById("welcome-chart-select");
+      if (select) {
+        select.addEventListener("change", () => {
+          activeChartQuizNo = select.value || "all";
+          renderProgressChart();
+        });
+      }
+    }
+
+    function setQuizProgressOpen(open) {
+      quizProgressOpen = Boolean(open);
+      welcomeQuizProgress.style.display = quizProgressOpen ? "block" : "none";
+      welcomeClearedStat.setAttribute("aria-expanded", quizProgressOpen ? "true" : "false");
+      welcomeClearedHint.textContent = quizProgressOpen
+        ? "確認テスト別の統計を隠す"
+        : "確認テスト別の統計を表示";
+    }
+
+    function installQuizProgressToggle() {
+      welcomeClearedStat.addEventListener("click", () => {
+        setQuizProgressOpen(!quizProgressOpen);
+      });
     }
 
     function renderLessonCards() {
@@ -1353,8 +1795,9 @@
         welcomeCleared.textContent = `${data.cleared_quizzes ?? 0} / ${data.total_quizzes ?? 0}`;
         welcomePerfect.textContent = String(data.perfect_clears ?? 0);
         welcomeCompletion.textContent = `${data.completion_rate ?? 0}%`;
-        welcomeChart.innerHTML = buildProgressChart(data.attempt_history);
-        welcomeChart.style.display = "block";
+        welcomeProgressData = data;
+        renderConfirmationTestProgress(data);
+        renderProgressChart();
         clearedQuizNumbers = new Set((data.cleared_quiz_numbers || []).map((value) => Number(value)));
         renderLessonCards();
       } catch (error) {
@@ -1543,6 +1986,7 @@
 
     renderLessonCards();
     scheduleNextPublishRefresh();
+    installQuizProgressToggle();
 
     initIndexLiff();
   </script>
