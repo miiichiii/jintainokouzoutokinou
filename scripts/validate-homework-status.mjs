@@ -9,6 +9,26 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const indexPath = path.resolve(scriptDir, "..", "index.html");
 const source = fs.readFileSync(indexPath, "utf8");
 
+const examScheduleMarkers = [
+  'class="exam-schedule-notice"',
+  "試験日程",
+  "機能領域",
+  "8月10日（月）1限、9:00～10:30",
+  "構造領域",
+  "8月10日（月）4限、14:50～16:20",
+  'datetime="2026-08-10T09:00:00+09:00"',
+  'datetime="2026-08-10T14:50:00+09:00"',
+];
+const missingExamScheduleMarkers = examScheduleMarkers.filter((marker) => !source.includes(marker));
+if (missingExamScheduleMarkers.length) {
+  throw new Error(`試験日程表示が不足しています: ${missingExamScheduleMarkers.join(", ")}`);
+}
+const examScheduleStart = source.indexOf('<section class="exam-schedule-notice"');
+const confirmationNoticeStart = source.indexOf('<section class="confirmation-test-notice"');
+if (examScheduleStart < 0 || confirmationNoticeStart < 0 || examScheduleStart > confirmationNoticeStart) {
+  throw new Error("試験日程は確認テストのお知らせより上に表示してください");
+}
+
 const confirmationTestNotice =
   "先ほどの確認テストに関する連絡について、システム上の表示に一部不整合がある可能性が判明しました。クイズTOPで第1〜9回がすべて「クリア済み」と表示されている方は、対応不要です。未クリア表示の方についても現在記録を確認しています。皆さんに不利益が生じないよう対応しますので、現時点では再受験する必要はありません。";
 if ((source.match(new RegExp(confirmationTestNotice, "g")) || []).length !== 1) {

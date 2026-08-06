@@ -333,6 +333,69 @@
       line-height: 1.8;
     }
 
+    .exam-schedule-notice {
+      margin-top: 16px;
+      padding: 20px;
+      border: 2px solid rgba(35, 80, 167, 0.48);
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(226, 239, 255, 0.98), rgba(255, 255, 255, 0.9)),
+        linear-gradient(135deg, rgba(156, 232, 223, 0.24), rgba(183, 203, 255, 0.24));
+      box-shadow: 0 14px 30px rgba(44, 86, 158, 0.16);
+    }
+
+    .exam-schedule-notice-kicker {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #173665;
+      color: #ffffff;
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .exam-schedule-notice h2 {
+      margin: 10px 0 0;
+      color: #102f60;
+      font-size: 1.28rem;
+      font-family: "Noto Sans JP", sans-serif;
+      line-height: 1.35;
+    }
+
+    .exam-schedule-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .exam-schedule-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid rgba(35, 80, 167, 0.16);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .exam-schedule-area {
+      color: #294f87;
+      font-size: 0.88rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .exam-schedule-time {
+      color: #102f60;
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1.5;
+    }
+
     .confirmation-test-notice {
       margin-top: 16px;
       padding: 18px;
@@ -1001,6 +1064,15 @@
         padding: 16px;
       }
 
+      .exam-schedule-notice {
+        padding: 16px;
+      }
+
+      .exam-schedule-item {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
       .homework-status-head {
         display: block;
       }
@@ -1068,6 +1140,20 @@
     <section id="welcome-panel" class="panel" style="display: none;">
       <div id="welcome-badge" class="welcome-badge" style="display: none;"></div>
       <div id="welcome-name" class="welcome-name" style="display: none;"></div>
+      <section class="exam-schedule-notice" aria-labelledby="exam-schedule-title">
+        <div class="exam-schedule-notice-kicker">重要</div>
+        <h2 id="exam-schedule-title">試験日程</h2>
+        <div class="exam-schedule-list">
+          <div class="exam-schedule-item">
+            <span class="exam-schedule-area">機能領域</span>
+            <strong class="exam-schedule-time"><time datetime="2026-08-10T09:00:00+09:00">8月10日（月）1限、9:00～10:30</time></strong>
+          </div>
+          <div class="exam-schedule-item">
+            <span class="exam-schedule-area">構造領域</span>
+            <strong class="exam-schedule-time"><time datetime="2026-08-10T14:50:00+09:00">8月10日（月）4限、14:50～16:20</time></strong>
+          </div>
+        </div>
+      </section>
       <section class="confirmation-test-notice" aria-labelledby="confirmation-test-notice-title">
         <div id="confirmation-test-notice-title" class="confirmation-test-notice-title">確認テストに関するお知らせ</div>
         <p class="confirmation-test-notice-message">先ほどの確認テストに関する連絡について、システム上の表示に一部不整合がある可能性が判明しました。クイズTOPで第1〜9回がすべて「クリア済み」と表示されている方は、対応不要です。未クリア表示の方についても現在記録を確認しています。皆さんに不利益が生じないよう対応しますので、現時点では再受験する必要はありません。</p>
